@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CasiLiem Studio Dashboard v24.0 - Live Pro XXL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            background-color: #020617; 
+            background-size: cover; 
+            background-position: center; 
+            background-attachment: fixed;
+            color: #f8fafc; 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden;
+            transition: background 0.5s ease;
+        }
+        .app-layout { display: flex; height: 100vh; width: 100vw; }
+        
+        /* Layout Structure */
+        .regie-panel { width: 20%; height: 100%; display: flex; flex-direction: column; padding: 1rem; gap: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.05); overflow-y: auto; }
+        .main-workspace { width: 55%; height: 100%; display: flex; flex-direction: column; padding: 1rem; gap: 1rem; position: relative; }
+        .side-panel { width: 25%; height: 100%; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(30px); border-left: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.5); z-index: 30; }
+
+        .app-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.95); z-index: -1; backdrop-filter: blur(5px); }
+        .banner-loaded .app-overlay { background: rgba(2, 6, 23, 0.4); backdrop-filter: blur(3px); }
+        .glass { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); }
+        
+        .font-studio { font-weight: 900; letter-spacing: -0.05em; text-transform: uppercase; }
+        
+        /* KARAOKE STYLES (Accessible) */
+        .word-highlight { font-weight: 900; transform: scale(1.1); display: inline-block; transition: all 0.1s; }
+        .s1-active { color: #38bdf8; text-shadow: 0 0 25px #38bdf8; }
+        .s2-active { color: #fb923c; text-shadow: 0 0 25px #fb923c; }
+        .sd-active { color: #facc15; text-shadow: 0 0 25px #facc15; }
+        .s1-pending { color: #0c4a6e; opacity: 0.9; } 
+        .s2-pending { color: #7c2d12; opacity: 0.9; }
+        .sd-pending { color: #713f12; opacity: 0.9; }
+        .word-done { color: #94a3b8; opacity: 0.2; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* PITCH & SCORE */
+        .pitch-container { position: relative; height: 80px; width: 100%; background: rgba(0,0,0,0.4); border-radius: 1rem; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        #pitchCanvas { width: 100%; height: 100%; }
+        .score-display { position: absolute; top: 10px; right: 20px; font-size: 1.8rem; font-weight: 900; color: #fbbf24; text-shadow: 0 0 15px rgba(251, 191, 36, 0.6); z-index: 20; }
+        
+        :root { --theme-color: #3b82f6; }
+        .theme-text { color: var(--theme-color); } .theme-bg { background-color: var(--theme-color); }
+        .btn-primary { background-color: var(--theme-color); color: white; transition: all 0.2s; }
+        .btn-primary:hover { filter: brightness(1.15); transform: scale(0.98); }
+        
+        /* CHAT MSG */
+        .chat-msg { margin-bottom: 15px; padding: 12px 16px; border-radius: 15px; animation: popIn 0.3s ease; line-height: 1.4; font-size: 13px; }
+        .msg-bot { background: rgba(255, 255, 255, 0.05); border-left: 3px solid var(--theme-color); color: #e2e8f0; }
+        .msg-user { background: var(--theme-color); color: white; align-self: flex-end; width: 90%; }
+        
+        /* TABS */
+        .tab-btn.active { background: var(--theme-color); color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.2); }
+        .tab-btn { flex: 1; padding: 0.75rem; border-radius: 0.8rem; text-align: center; transition: all 0.3s; font-weight: 900; text-transform: uppercase; font-size: 0.7rem; color: #94a3b8; background: rgba(0,0,0,0.2); border: 1px solid transparent; }
+        
+        /* PLAYER PILLS */
+        .player-pill { padding: 3px 10px; border-radius: 99px; background: rgba(255,255,255,0.05); color: #94a3b8; font-size: 9px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.1); white-space: nowrap; }
+        .player-pill:hover { background: var(--theme-color); color: white; border-color: rgba(255,255,255,0.3); transform: translateY(-1px); }
+
+        #countdownOverlay {
+            position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 14rem; font-weight: 900; color: white;
+            text-shadow: 0 0 80px var(--theme-color, #60a5fa);
+            pointer-events: none; z-index: 100; display: none;
+        }
+        .countdown-active { display: block !important; }
+
+        .harmony-bar-container { position: relative; height: 10px; background: #0f172a; border-radius: 99px; overflow: hidden; display: flex; border: 1px solid rgba(255,255,255,0.1); }
+        .harmony-indicator { position: absolute; top: -3px; width: 4px; height: 16px; background: white; border-radius: 2px; box-shadow: 0 0 5px white; transition: left 0.15s ease-out; z-index: 20; }
+        
+        /* ERROR MODAL SPECIAL FOR LOCAL */
+        #errorModal { display: none; }
+    </style>
+</head>
+<body>
+    <div class="app-overlay" id="mainOverlay"></div>
+    <div id="toast">Action Confirmée</div>
+
+    <!-- ERROR MODAL (RESILIENT) -->
+    <div id="errorModal" class="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 backdrop-blur-md">
+        <div class="glass p-10 rounded-[3rem] max-w-xl w-full text-center border border-red-500/30 shadow-2xl">
+            <h2 class="text-2xl font-black text-white mb-4 uppercase tracking-tighter">Micro Bloqué (Mode Local Détecté)</h2>
+            <p class="text-slate-400 text-sm mb-8">Les navigateurs bloquent le micro sur les fichiers locaux par sécurité.</p>
+            
+            <div class="bg-blue-500/10 p-5 rounded-2xl mb-8 text-left border border-blue-500/20 space-y-4">
+                <p class="text-blue-400 font-bold text-xs uppercase">🚀 Solution Pro pour CasiLiem :</p>
+                <div class="text-[11px] text-slate-300 space-y-2 leading-relaxed">
+                    <p><b>1.</b> Installez l'extension Chrome <b>"Web Server for Chrome"</b>.</p>
+                    <p><b>2.</b> Ou utilisez un service comme <b>GitHub Pages</b> (gratuit) pour héberger votre fichier en <b>https://</b>.</p>
+                    <p><b>3.</b> En attendant, utilisez le <b>Mode Simulation</b> pour tester l'interface XXL.</p>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <button onclick="initAudio()" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg">Réessayer de Connecter</button>
+                <button onclick="enableSimulation()" class="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all">Mode Simulation (Sans micro)</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-layout">
+        
+        <!-- 1. REGIE PANEL (Left - 20%) -->
+        <div class="regie-panel no-scrollbar">
+            <div class="flex items-center gap-3 mb-4">
+                <div id="logoBox" class="w-10 h-10 theme-bg rounded-xl flex items-center justify-center shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
+                </div>
+                <div class="leading-none">
+                    <h1 class="text-xs font-black text-white uppercase tracking-tighter">Studio XXL</h1>
+                    <span class="text-[7px] text-white/30 font-mono">v24.0 Live Pro</span>
+                </div>
+            </div>
+
+            <!-- SELECTION TITRE -->
+            <section class="glass p-4 rounded-[1.5rem] border border-white/5 space-y-3">
+                <select id="projectSelector" onchange="updateAlbumSelection()" class="w-full bg-slate-800 border border-slate-700 text-white text-[9px] font-bold py-2 px-2 rounded-lg outline-none uppercase tracking-widest" title="Sélection de l'album de la session">
+                    <option value="INSIDE_REMIX">INSIDE REMIX</option>
+                    <option value="109_AVENUE">109 AVENUE</option>
+                    <option value="VIBRATIONS">VIBRATIONS</option>
+                </select>
+                <select id="songSelector" onchange="updateSongSelection()" class="w-full bg-slate-900 border border-slate-700 text-blue-400 text-[9px] font-bold py-2 px-2 rounded-lg outline-none uppercase tracking-widest" title="Chargement des paroles du titre">
+                </select>
+                <button id="masterToggleBtn" onclick="initAudio()" class="w-full py-2 btn-primary rounded-xl font-black text-[9px] uppercase shadow-lg" title="Lancer le moteur audio (Requis pour l'analyse)">Démarrer</button>
+            </section>
+
+            <!-- CONTEST & MEMORY (5 DERNIERS) -->
+            <section class="glass p-4 rounded-[1.5rem] border border-blue-500/20">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Contest</h2>
+                    <div class="flex bg-black/40 p-0.5 rounded-lg" title="Choix entre solo et duo">
+                        <button onclick="setGameType('SOLO')" id="typeSolo" class="px-2 py-1 rounded text-[7px] font-bold bg-theme-bg text-white shadow-lg">SOLO</button>
+                        <button onclick="setGameType('DUO')" id="typeDuo" class="px-2 py-1 rounded text-[7px] font-bold text-slate-400">DUO</button>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-[8px] font-bold text-blue-400 uppercase ml-1 block mb-1">Chanteur 1 (Toi)</label>
+                        <input type="text" id="p1Name" value="CasiLiem" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[10px] text-white outline-none focus:border-blue-500" title="Tape ton nom ou sélectionne en bas">
+                        <div id="p1Recent" class="flex flex-wrap gap-1 mt-2"></div>
+                    </div>
+                    <div id="p2Container" class="hidden">
+                        <label class="text-[8px] font-bold text-orange-400 uppercase ml-1 block mb-1">Chanteur 2 (Invité)</label>
+                        <input type="text" id="p2Name" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-[10px] text-white outline-none focus:border-orange-500" placeholder="Nom..." title="Tape le nom de l'invité ou sélectionne en bas">
+                        <div id="p2Recent" class="flex flex-wrap gap-1 mt-2"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- HARMONY -->
+            <section class="glass p-4 rounded-[1.5rem] border border-blue-500/20" title="Équilibre entre ta voix et l'instrumental">
+                 <h2 class="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-2">Harmonie</h2>
+                 <div class="harmony-bar-container mb-2">
+                    <div class="w-[45%] bg-blue-500/20"></div><div class="w-[10%] bg-green-500/30"></div><div class="w-[45%] bg-red-500/20"></div>
+                    <div id="harmonyIndicator" class="harmony-indicator" style="left: 50%;"></div>
+                </div>
+                <p id="harmonyAction" class="text-[8px] font-bold text-center text-white/60 uppercase">Attente...</p>
+            </section>
+
+            <!-- MASTERING -->
+            <section class="glass p-4 rounded-[1.5rem] border border-white/10" title="Réglages conseillés pour Soundtrap">
+                <h3 class="text-[9px] font-black theme-text uppercase tracking-widest mb-2">Mastering</h3>
+                <select id="masteringSelector" onchange="updateMasteringAdvice()" class="w-full bg-black/40 border border-white/10 text-white text-[9px] py-1.5 px-2 rounded mb-2">
+                    <option value="SUB_BOOST">SUB BOOST</option><option value="PUNCHY">PUNCHY</option><option value="SOFT">SOFT</option><option value="AIR">AIR</option><option value="CLEAN">CLEAN</option>
+                </select>
+                <div id="masteringAdviceBox" class="p-2 bg-white/5 rounded text-[8px] text-slate-400 italic">Cible: 0.69</div>
+            </section>
+
+            <!-- VISUAL LAB -->
+            <section class="glass p-4 rounded-[1.5rem] border border-white/10">
+                 <h2 class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Visual Lab</h2>
+                 <div class="flex gap-2">
+                     <div id="imagePreview" class="w-10 h-10 bg-black rounded-lg border border-white/10 flex-shrink-0 overflow-hidden"><img id="resultImg" class="hidden w-full h-full object-cover"></div>
+                     <div class="flex-1">
+                         <textarea id="promptIn" class="w-full bg-black border border-slate-800 rounded p-1 text-[7px] text-slate-300 h-8 resize-none" placeholder="Prompt..."></textarea>
+                         <button id="genBtn" class="w-full mt-1 py-1 btn-primary font-bold rounded text-[7px] uppercase" title="Générer une pochette d'album">Générer</button>
+                     </div>
+                 </div>
+            </section>
+
+            <!-- CONFIG SAVE -->
+            <div class="flex gap-2 mt-auto pt-4 border-t border-white/5">
+                <label class="cursor-pointer flex-1 p-2 rounded-lg bg-slate-800 hover:bg-blue-600 transition-colors flex justify-center items-center" title="Importer Instrumental (MP3/WAV)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>
+                    <input type="file" id="audioUpload" accept="audio/*" class="hidden" onchange="loadAudioFile(this)">
+                </label>
+                <button onclick="exportConfig()" class="flex-1 p-2 rounded-lg bg-slate-800 hover:bg-green-600 transition-colors flex justify-center items-center" title="Tout sauvegarder (Config + Scores)"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg></button>
+            </div>
+        </div>
+
+        <!-- 2. MAIN SPECTACLE AREA (Center - 55%) -->
+        <div class="main-workspace overflow-hidden">
+            <!-- PLAYER BAR -->
+            <div id="audioPlayerBar" class="hidden glass p-3 rounded-2xl flex items-center gap-4 border border-white/10">
+                <button id="playPauseBtn" class="w-8 h-8 rounded-full theme-bg flex items-center justify-center text-white" onclick="togglePlay()" title="Lecture / Pause">
+                    <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </button>
+                <div class="flex-1"><input type="range" id="progressBar" value="0" class="w-full h-1 bg-white/10 rounded-full appearance-none cursor-pointer" onchange="seekAudio(this.value)"></div>
+                <p id="trackTime" class="text-[9px] font-mono text-white w-10">00:00</p>
+            </div>
+
+            <!-- TABS -->
+            <div class="tab-container">
+                <button onclick="switchTab('sync')" id="tab-sync" class="tab-btn active" title="Mode Performance Karaoké">Mode Spectacle</button>
+                <button onclick="switchTab('compose')" id="tab-compose" class="tab-btn" title="Mode Écriture et Assignation">Mode Composition</button>
+            </div>
+
+            <!-- KARAOKE FULL SCREEN -->
+            <div id="content-sync" class="block flex-1 relative overflow-hidden">
+                <section class="glass p-6 rounded-[3rem] border border-white/10 h-full flex flex-col theme-shadow relative overflow-hidden">
+                    <div id="countdownOverlay"></div>
+                    
+                    <!-- Top Bar -->
+                    <div class="flex justify-between items-center mb-6 z-10">
+                        <div class="flex items-center gap-3">
+                            <div class="flex bg-black/40 p-1 rounded-lg">
+                                <button onclick="setSyncMode('voice')" id="modeVoice" class="px-3 py-1 rounded text-[8px] font-bold text-white bg-slate-700 uppercase" title="Synchronisation automatique via voix">Voix</button>
+                                <button onclick="setSyncMode('manual')" id="modeManual" class="px-3 py-1 rounded text-[8px] font-bold text-slate-400 uppercase" title="Synchronisation manuelle (Espace)">Clavier</button>
+                            </div>
+                            <span id="syncStatus" class="hidden text-[9px] font-bold text-green-400 uppercase tracking-widest animate-pulse">● Connecté</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <button id="recBtn" disabled class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl text-[10px] uppercase shadow-lg" title="Enregistrer la mélodie de référence">REC REF</button>
+                            <button id="playGameBtn" disabled class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white font-black rounded-xl text-[10px] uppercase shadow-lg" onclick="startGameMode()" title="Démarrer le karaoké avec score">JOUER</button>
+                            <button id="stopRecBtn" disabled class="px-4 py-2 bg-slate-700 text-white font-black rounded-xl text-[10px] uppercase" title="Arrêter l'action en cours">STOP</button>
+                        </div>
+                    </div>
+                    
+                    <div class="pitch-container flex-shrink-0 mb-6 z-10" title="Visualisation mélodique">
+                        <canvas id="pitchCanvas"></canvas>
+                        <div id="scoreDisplay" class="score-display hidden"><span id="scoreVal">0</span> PTS</div>
+                    </div>
+
+                    <button id="tapButton" onclick="manualTap()" class="active mb-4 z-10" title="Appuyez ici au début de chaque ligne chantée">TAP / ESPACE ICI</button>
+
+                    <!-- XXL LYRICS AREA -->
+                    <div id="lyricContainer" class="flex-1 overflow-y-auto no-scrollbar space-y-16 text-7xl font-black leading-tight text-slate-600 select-none scroll-smooth text-center py-20 z-0">
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-white/5 flex justify-between items-center z-10">
+                        <button id="resetPrompter" class="text-[9px] font-bold text-slate-500 hover:text-white uppercase">Reset</button>
+                        <button id="exportLRC" class="text-[10px] font-black btn-primary px-4 py-2 rounded-lg uppercase shadow-lg" title="Générer fichier synchronisé (.lrc)">Exporter LRC</button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- COMPOSITION FULL SCREEN -->
+            <div id="content-compose" class="hidden h-full">
+                <section class="glass p-6 rounded-[3rem] border border-white/10 h-full flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xs font-black text-white uppercase tracking-[0.4em]">Composition & Rôles</h2>
+                        <div class="flex bg-black/40 p-1 rounded-lg" title="Mode d'édition">
+                            <button onclick="toggleComposeView('text')" id="btnViewText" class="px-3 py-1 text-[9px] font-bold text-slate-400 uppercase">Brut</button>
+                            <button onclick="toggleComposeView('assign')" id="btnViewAssign" class="px-3 py-1 text-[9px] font-bold bg-slate-700 text-white rounded uppercase">Rôles</button>
+                        </div>
+                    </div>
+                    <textarea id="composeArea" oninput="saveCurrentLyrics()" class="hidden flex-1 bg-slate-950/50 border border-white/10 rounded-2xl p-6 text-sm text-slate-300 font-mono leading-relaxed focus:outline-none focus:border-white/30 resize-none" placeholder="Tape tes paroles..."></textarea>
+                    <div id="assignContainer" class="flex-1 bg-slate-950/30 border border-white/5 rounded-2xl p-4 overflow-y-auto space-y-1 no-scrollbar"></div>
+                    <div class="mt-4 flex justify-end">
+                        <button onclick="transferToKaraoke()" class="px-6 py-3 btn-primary rounded-xl font-black text-[10px] uppercase shadow-lg">Mettre à jour Spectacle</button>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- 3. SIDEBAR (Right - 25%) -->
+        <div class="side-panel">
+            <div class="p-6 theme-bg flex items-center justify-between shadow-lg z-20">
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg></div>
+                    <div id="sidebarTitle">
+                        <h2 class="text-lg font-black text-white uppercase tracking-tight leading-none">Hall of Fame</h2>
+                        <p class="text-[9px] text-white/70 font-bold mt-1 uppercase tracking-widest">Top 10 Contest</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 1: LEADERBOARD -->
+            <div id="sidebarLeaderboard" class="flex-1 flex flex-col overflow-hidden bg-slate-900/30">
+                <div id="leaderboardList" class="flex-1 overflow-y-auto p-4 no-scrollbar">
+                </div>
+            </div>
+
+            <!-- VIEW 2: CHATBOT -->
+            <div id="sidebarChatbot" class="hidden flex-1 flex flex-col overflow-hidden">
+                <div id="chatMessages" class="flex-1 overflow-y-auto p-6 flex flex-col gap-4 bg-slate-900/30 no-scrollbar">
+                    <div class="chat-msg msg-bot"><p>Salut CasiLiem ! Je t'aide à écrire ?</p></div>
+                </div>
+                <div class="p-6 bg-black/20 border-t border-white/5 backdrop-blur-md">
+                    <div class="relative">
+                        <input type="text" id="chatInput" placeholder="Écris ici..." class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 pr-12 text-xs font-bold text-white outline-none focus:border-white/30 transition-all font-studio" onkeypress="handleChatInput(event)">
+                        <button onclick="sendUserMessage()" class="absolute right-2 top-2 p-2 text-slate-400 hover:text-white transition-colors" title="Envoyer"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = "";
+        const masteringConfig = { 'SUB_BOOST': { advice: "Techno/Tribal. Kick lourd." }, 'PUNCHY': { advice: "Reggaeton/Pop. Dynamique." }, 'SOFT': { advice: "Chill House. Chaleur vocale." }, 'AIR': { advice: "Acoustique. Brillance." }, 'CLEAN': { advice: "Neutre. Fidélité." } };
+        
+        let db = {
+            'INSIDE_REMIX': { style: "Chill House", master: "SOFT", theme: "Dreamy pastel.", songs: [ { title: "Voyage en Europe", lyrics: ["[Intro]", "[1] Le moteur a brisé le silence.", "[2] Un dernier regard à la France.", "[D] Juste un sac, aucune importance."], lrc: [], pitchRef: [] } ] },
+            '109_AVENUE': { style: "Techno House", master: "SUB_BOOST", theme: "Urban neon.", songs: [ { title: "L'attente dehors", lyrics: ["[Intro]", "[1] L'attente dehors."], lrc: [], pitchRef: [] } ] },
+            'VIBRATIONS': { style: "Reggaeton", master: "PUNCHY", theme: "Warm sunset.", songs: [ { title: "Je veux juste rentrer", lyrics: ["[Intro]", "[1] Je veux juste rentrer."], lrc: [], pitchRef: [] } ] }
+        };
+
+        let leaderboard = []; let recentPlayers = ["CasiLiem"];
+        let gameType = 'SOLO'; let syncMode='voice';
+        let audioCtx, micAnalyser, musicAnalyser, dataArrayMic, dataArrayMusic, isRunning=false, isSimulation=false;
+        let mediaRecorder, chunks=[], startTime=0, isRecording=false, isGameMode=false;
+        let lrcData=[], wordElements=[], currentIndex=0;
+        let sourceNode, fileSourceNode, audioEl, currentSongRef=null, score=0;
+        let pitchBufferLength, pitchBuffer;
+
+        // --- ROBUST AUDIO INIT ---
+        async function initAudio(){
+            const errModal = document.getElementById('errorModal');
+            const btn = document.getElementById('masterToggleBtn');
+            if(!audioCtx){
+                try{
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(err => { throw new Error("BLOCKED"); });
+                    sourceNode = audioCtx.createMediaStreamSource(stream);
+                    micAnalyser = audioCtx.createAnalyser(); micAnalyser.fftSize = 2048;
+                    sourceNode.connect(micAnalyser);
+                    dataArrayMic = new Uint8Array(micAnalyser.frequencyBinCount);
+                    pitchBuffer = new Uint8Array(micAnalyser.fftSize);
+                    musicAnalyser = audioCtx.createAnalyser(); musicAnalyser.fftSize = 512;
+                    dataArrayMusic = new Uint8Array(musicAnalyser.frequencyBinCount);
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.ondataavailable = e => chunks.push(e.data);
+                    mediaRecorder.onstop = saveRecording;
+                    
+                    isRunning = true;
+                    btn.textContent = "ACTIF"; btn.classList.replace('bg-blue-600', 'bg-slate-800');
+                    errModal.style.display = 'none';
+                    loop();
+                } catch(e) {
+                    errModal.style.display = 'flex';
+                }
+            } else if(audioCtx.state === 'suspended'){ audioCtx.resume(); }
+        }
+
+        function enableSimulation(){ document.getElementById('errorModal').style.display = 'none'; isSimulation = true; isRunning = true; document.getElementById('masterToggleBtn').textContent = "SIMU"; loop(); }
+
+        // --- QUICK SELECT (5 DERNIERS) ---
+        function refreshQuickSelect() {
+            const lastFive = recentPlayers.slice(0, 5);
+            const c1 = document.getElementById('p1Recent');
+            const c2 = document.getElementById('p2Recent');
+            c1.innerHTML = ''; c2.innerHTML = '';
+            lastFive.forEach(n => {
+                const b1 = document.createElement('button'); b1.className="player-pill"; b1.textContent=n; b1.onclick=()=>{document.getElementById('p1Name').value=n;};
+                const b2 = document.createElement('button'); b2.className="player-pill"; b2.textContent=n; b2.onclick=()=>{document.getElementById('p2Name').value=n;};
+                c1.appendChild(b1); c2.appendChild(b2);
+            });
+        }
+
+        function trackParticipant(n) {
+            if(!n) return; n = n.trim();
+            recentPlayers = recentPlayers.filter(x => x !== n);
+            recentPlayers.unshift(n);
+            if(recentPlayers.length > 10) recentPlayers.pop();
+            saveSettings('casiLiem_recentPlayers', JSON.stringify(recentPlayers));
+            refreshQuickSelect();
+        }
+
+        // --- VIEW SWITCH & SIDEBAR ---
+        function switchTab(t) {
+            document.getElementById('content-sync').classList.toggle('hidden', t !== 'sync');
+            document.getElementById('content-compose').classList.toggle('hidden', t !== 'compose');
+            document.getElementById('tab-sync').classList.toggle('active', t === 'sync');
+            document.getElementById('tab-compose').classList.toggle('active', t === 'compose');
+            const sidebarChat = document.getElementById('sidebarChatbot');
+            const sidebarBoard = document.getElementById('sidebarLeaderboard');
+            const title = document.getElementById('sidebarTitle');
+            if(t === 'sync') {
+                sidebarChat.classList.add('hidden'); sidebarBoard.classList.remove('hidden');
+                title.innerHTML = '<h2 class="text-lg font-black text-white uppercase tracking-tight leading-none">Hall of Fame</h2><p class="text-[9px] text-white/70 font-bold mt-1 uppercase tracking-widest">Top 10 Contest</p>';
+                refreshLeaderboard();
+            } else {
+                sidebarBoard.classList.add('hidden'); sidebarChat.classList.remove('hidden');
+                title.innerHTML = '<h2 class="text-lg font-black text-white uppercase tracking-tight leading-none">Assistant</h2><p class="text-[9px] text-white/70 font-bold mt-1 uppercase tracking-widest">Studio CasiLiem</p>';
+                toggleComposeView('assign');
+            }
+        }
+
+        // --- PITCH ENGINE ---
+        function autoCorrelate(buf, sr) { let SIZE=buf.length, rms=0; for(let i=0;i<SIZE;i++){let v=(buf[i]-128)/128;rms+=v*v;} rms=Math.sqrt(rms/SIZE); if(rms<0.05)return -1; let r1=0, r2=SIZE-1, thres=0.2; for(let i=0; i<SIZE/2; i++) if(Math.abs(buf[i]-128)<thres){r1=i;break;} for(let i=1; i<SIZE/2; i++) if(Math.abs(buf[SIZE-i]-128)<thres){r2=SIZE-i;break;} buf=buf.slice(r1,r2); SIZE=buf.length; let c=new Array(SIZE).fill(0); for(let i=0;i<SIZE;i++)for(let j=0;j<SIZE-i;j++)c[i]+=((buf[j]-128)/128)*((buf[j+i]-128)/128); let d=0; while(c[d]>c[d+1]) d++; let maxval=-1,maxpos=-1; for(let i=d;i<SIZE;i++) if(c[i]>maxval){maxval=c[i];maxpos=i;} return sr/maxpos; }
+        const pCanvas=document.getElementById('pitchCanvas'), pCtx=pCanvas.getContext('2d');
+        function resizeCanvas(){pCanvas.width=pCanvas.clientWidth;pCanvas.height=pCanvas.clientHeight;} window.addEventListener('resize',resizeCanvas); resizeCanvas();
+        function drawPitch(){ pCtx.clearRect(0,0,pCanvas.width,pCanvas.height); if(!isRecording&&!isGameMode)return; if(currentSongRef&&currentSongRef.pitchRef&&currentSongRef.pitchRef.length>0){pCtx.beginPath();pCtx.strokeStyle="rgba(59, 130, 246, 0.4)";pCtx.lineWidth=3;const tNow=(audioEl&&!audioEl.paused)?audioEl.currentTime:(Date.now()-startTime)/1000;const pxPerSec=pCanvas.width/5;for(let i=0; i<currentSongRef.pitchRef.length; i++){let p=currentSongRef.pitchRef[i];let x=(p.t-tNow+2.5)*pxPerSec;let y=pCanvas.height-((p.hz-100)/500*pCanvas.height);if(x>0&&x<pCanvas.width){if(i===0)pCtx.moveTo(x,y);else pCtx.lineTo(x,y);}}pCtx.stroke();} }
+
+        function loop(){
+            if(!isRunning)return; requestAnimationFrame(loop);
+            let hz=-1, ml=0, mul=0;
+            if(!isSimulation && micAnalyser){
+                micAnalyser.getByteFrequencyData(dataArrayMic); ml=calculateRMS(dataArrayMic);
+                micAnalyser.getByteTimeDomainData(pitchBuffer); hz=autoCorrelate(pitchBuffer,audioCtx.sampleRate);
+                musicAnalyser.getByteFrequencyData(dataArrayMusic); mul=calculateRMS(dataArrayMusic);
+            } else if(isSimulation) {
+                const t=Date.now()/1000; ml=40+Math.sin(t*3)*20; mul=40+Math.cos(t*2)*20; hz=200+Math.sin(t)*100;
+            }
+            const tNow=(audioEl&&!audioEl.paused)?audioEl.currentTime:(Date.now()-startTime)/1000;
+            if(isRecording&&hz>0&&currentSongRef){
+                if(!currentSongRef.pitchRef)currentSongRef.pitchRef=[];
+                if(currentSongRef.pitchRef.length===0||tNow-currentSongRef.pitchRef[currentSongRef.pitchRef.length-1].t>0.05) currentSongRef.pitchRef.push({t:tNow,hz:hz});
+            }
+            if(isGameMode&&hz>0&&currentSongRef&&currentSongRef.pitchRef){
+                const m=currentSongRef.pitchRef.find(p=>Math.abs(p.t-tNow)<0.1);
+                if(m){ const d=Math.abs(m.hz-hz); if(d<25){score+=5;document.getElementById('scoreVal').textContent=score;pCtx.fillStyle="#4ade80";pCtx.beginPath();pCtx.arc(pCanvas.width/2.5,pCanvas.height-((hz-100)/500*pCanvas.height),4,0,2*Math.PI);pCtx.fill();} }
+            }
+            drawPitch();
+            let tot=ml+mul, bal=50; if(tot>10)bal=(ml/tot)*100;
+            document.getElementById('harmonyIndicator').style.left=bal+"%";
+            const ha=document.getElementById('harmonyAction');
+            if(tot<10)ha.textContent="Analyse..."; else if(bal>40&&bal<60)ha.textContent="Équilibre OK"; else if(bal<=40)ha.textContent="Voix Faible"; else ha.textContent="Voix Forte";
+        }
+
+        // CONTEST
+        function setGameType(t){gameType=t;const s=document.getElementById('typeSolo'),d=document.getElementById('typeDuo'),p2=document.getElementById('p2Container');if(t==='SOLO'){s.className="flex-1 py-2 rounded-lg text-[9px] font-bold bg-theme-bg text-white shadow-lg";d.className="flex-1 py-2 rounded-lg text-[9px] font-bold text-slate-400";p2.classList.add('hidden');}else{d.className="flex-1 py-2 rounded-lg text-[9px] font-bold bg-theme-bg text-white shadow-lg";s.className="flex-1 py-2 rounded-lg text-[9px] font-bold text-slate-400";p2.classList.remove('hidden');}if(currentSongRef)loadLyricsToPrompter(currentSongRef.lyrics);}
+        function startGameMode(){isGameMode=true;score=0;document.getElementById('scoreVal').textContent="0";document.getElementById('scoreDisplay').classList.remove('hidden');togglePlay();}
+        function stopGameAndSave(){isGameMode=false;const p1=document.getElementById('p1Name').value||'CasiLiem',p2=document.getElementById('p2Name').value,st=currentSongRef?currentSongRef.title:"Inconnu",e={p1,p2:gameType==='DUO'?p2:null,song:st,score,date:new Date().toLocaleDateString()};leaderboard.push(e);leaderboard.sort((a,b)=>b.score-a.score);if(leaderboard.length>10)leaderboard=leaderboard.slice(0,10);trackParticipant(p1);if(gameType==='DUO'&&p2)trackParticipant(p2);refreshLeaderboard();document.getElementById('lastScore').textContent=score;saveSettings('casiLiem_leaderboard',JSON.stringify(leaderboard));}
+        function refreshLeaderboard(){const l=document.getElementById('leaderboardList');if(leaderboard.length===0){l.innerHTML='<p class="text-center text-slate-500 italic text-[10px] mt-10 uppercase">Aucun score.</p>';return;}l.innerHTML='';leaderboard.forEach((e,i)=>{const r=document.createElement('div');r.className="leader-row";const p=e.p2 ? `${e.p1} & ${e.p2}` : e.p1;r.innerHTML=`<div class="flex items-center gap-3"><div class="rank-badge ${i===0?'rank-1':''}">${i+1}</div><div><p class="font-bold text-white text-[10px] uppercase">${p}</p><p class="text-[8px] text-slate-500 uppercase">${e.song}</p></div></div><div class="text-right"><p class="font-black text-yellow-400 text-sm">${e.score}</p></div>`;l.appendChild(r);});}
+
+        // AUDIO
+        function loadAudioFile(input){if(input.files[0]){if(!audioCtx)initAudio();const f=input.files[0],u=URL.createObjectURL(f);audioEl=document.getElementById('mainAudio');audioEl.src=u;document.getElementById('trackName').textContent=f.name;document.getElementById('audioPlayerBar').classList.remove('hidden');if(fileSourceNode)fileSourceNode.disconnect();fileSourceNode=audioCtx.createMediaElementSource(audioEl);fileSourceNode.connect(musicAnalyser);fileSourceNode.connect(audioCtx.destination);audioEl.onended=()=>{if(isGameMode)stopGameAndSave();};}}
+        function calculateRMS(d){let s=0;for(let i=0;i<d.length;i++)s+=d[i]*d[i];return Math.sqrt(s/d.length);}
+        function togglePlay(){if(audioEl.paused){audioEl.play();document.getElementById('playIcon').classList.add('hidden');document.getElementById('pauseIcon').classList.remove('hidden');}else{audioEl.pause();document.getElementById('playIcon').classList.remove('hidden');document.getElementById('pauseIcon').classList.add('hidden');}}
+        function seekAudio(v){if(audioEl)audioEl.currentTime=(v/100)*audioEl.duration;}
+        function formatTime(s){const m=Math.floor(s/60),sc=(s%60).toFixed(2);return `${String(m).padStart(2,'0')}:${sc.padStart(5,'0')}`;}
+        document.getElementById('mainAudio').ontimeupdate=()=>{const p=(audioEl.currentTime/audioEl.duration)*100;document.getElementById('progressBar').value=p||0;document.getElementById('trackTime').textContent=formatTime(audioEl.currentTime);checkPlaybackSync();};
+
+        // DB & LYRICS
+        function updateAlbumSelection(){const k=document.getElementById('projectSelector').value,s=document.getElementById('songSelector');s.innerHTML="";const a=db[k];a.songs.forEach((x,i)=>{const o=document.createElement('option');o.value=i;o.textContent=x.title;s.appendChild(o);});document.getElementById('masteringSelector').value=a.master;updateSongSelection();}
+        function updateSongSelection(){const k=document.getElementById('projectSelector').value,i=document.getElementById('songSelector').value,s=db[k].songs[i];currentSongRef=s;document.getElementById('composeArea').value=s.lyrics.join('\n');loadLyricsToPrompter(s.lyrics);parseLyricsForAssign();if(s.lrc&&s.lrc.length>0)document.getElementById('syncStatus').classList.remove('hidden');else document.getElementById('syncStatus').classList.add('hidden');}
+        function saveCurrentLyrics(){if(currentSongRef)currentSongRef.lyrics=document.getElementById('composeArea').value.split('\n');}
+        function transferToKaraoke(){loadLyricsToPrompter(document.getElementById('composeArea').value.split('\n'));switchTab('sync');}
+        
+        function toggleComposeView(v){const a=document.getElementById('composeArea'),c=document.getElementById('assignContainer'),bt=document.getElementById('btnViewText'),ba=document.getElementById('btnViewAssign');if(v==='text'){a.classList.remove('hidden');c.classList.add('hidden');bt.className="px-3 py-1 text-[9px] font-bold bg-slate-700 text-white rounded";ba.className="px-3 py-1 text-[9px] font-bold text-slate-400";}else{a.classList.add('hidden');c.classList.remove('hidden');ba.className="px-3 py-1 text-[9px] font-bold bg-slate-700 text-white rounded";bt.className="px-3 py-1 text-[9px] font-bold text-slate-400";parseLyricsForAssign();}}
+        function parseLyricsForAssign(){const tx=document.getElementById('composeArea').value,ls=tx.split('\n'),c=document.getElementById('assignContainer');c.innerHTML='';ls.forEach((l,i)=>{let r=1,cnt=l;if(l.includes('[2]')){r=2;cnt=l.replace('[2] ','');}else if(l.includes('[D]')){r=3;cnt=l.replace('[D] ','');}if(l.startsWith('[')&&l.endsWith(']')){const d=document.createElement('div');d.className="text-[9px] text-slate-500 font-bold uppercase mt-2 mb-1";d.textContent=l;c.appendChild(d);return;}const rw=document.createElement('div');rw.className="assign-row";rw.innerHTML=`<div class="role-selector"><div class="role-btn ${r===1?'active-1':''}" onclick="setRole(${i},1)">1</div><div class="role-btn ${r===2?'active-2':''}" onclick="setRole(${i},2)">2</div><div class="role-btn ${r===3?'active-d':''}" onclick="setRole(${i},3)">D</div></div><input type="text" class="bg-transparent border-none text-[10px] text-slate-300 w-full outline-none" value="${cnt}" onchange="updateLineText(${i},this.value)">`;c.appendChild(rw);});}
+        function setRole(i,r){const tx=document.getElementById('composeArea').value;let ls=tx.split('\n'),l=ls[i].replace(/\[1\]\s?|\[2\]\s?|\[D\]\s?/g,''),p=r===2?'[2] ':r===3?'[D] ':'[1] ';ls[i]=p+l;document.getElementById('composeArea').value=ls.join('\n');saveCurrentLyrics();parseLyricsForAssign();}
+        function updateLineText(i,t){const tx=document.getElementById('composeArea').value;let ls=tx.split('\n'),p=ls[i].includes('[2]')?'[2] ':ls[i].includes('[D]')?'[D] ':'[1] ';ls[i]=p+t;document.getElementById('composeArea').value=ls.join('\n');saveCurrentLyrics();}
+
+        function loadLyricsToPrompter(l){const c=document.getElementById('lyricContainer');c.innerHTML='';wordElements=[];currentIndex=0;l.forEach(line=>{const d=document.createElement('div');if(line.startsWith('[')){d.className="mb-8 text-xl text-blue-400 font-mono opacity-80 mt-12";d.textContent=line;}else{let cc="s1-pending",dt=line;if(gameType==='DUO'){if(line.includes('[2]')){cc="s2-pending";dt=line.replace('[2] ','');}else if(line.includes('[D]')){cc="sd-pending";dt=line.replace('[D] ','');}else dt=line.replace('[1] ','');}else dt=line.replace(/\[1\]\s?|\[2\]\s?|\[D\]\s?/g,'');const s=document.createElement('span');s.textContent=dt;s.className=`word-pending ${cc} transition-all duration-200`;d.appendChild(s);wordElements.push({element:s,text:line.toLowerCase().replace(/[.,!?;:()\[\]0-9]/g,''),fullLine:line});}c.appendChild(d);});}
+        function checkPlaybackSync(){if(!currentSongRef||!currentSongRef.lrc||currentSongRef.lrc.length===0||isRecording)return;const t=audioEl.currentTime;let ai=-1;for(let i=0;i<currentSongRef.lrc.length;i++)if(t>=currentSongRef.lrc[i].time)ai=i;if(ai!==-1){const at=currentSongRef.lrc[ai].text;wordElements.forEach(e=>{if(e.fullLine===at){let hc="s1-active";if(gameType==='DUO'){if(e.fullLine.includes('[2]'))hc="s2-active";if(e.fullLine.includes('[D]'))hc="sd-active";}e.element.className=`word-highlight ${hc} scale-110 opacity-100`;e.element.scrollIntoView({behavior:'smooth',block:'center'});}else e.element.className="transition-all duration-300 opacity-20 word-done";});}const ni=ai+1;if(ni<currentSongRef.lrc.length){const tl=currentSongRef.lrc[ni].time-t,ov=document.getElementById('countdownOverlay');if(tl<=5&&tl>0){ov.textContent=Math.ceil(tl);ov.classList.add('countdown-active');ov.style.color=tl<=3?'#ef4444':'white';}else ov.classList.remove('countdown-active');}}
+
+        document.getElementById('recBtn').onclick=()=>{isRecording=true;chunks=[];startTime=Date.now();lrcData=["[ar:CasiLiem]"];if(currentSongRef){currentSongRef.lrc=[];currentSongRef.pitchRef=[];}mediaRecorder.start();if(recognition&&syncMode==='voice')recognition.start();document.getElementById('recBtn').disabled=true;document.getElementById('stopRecBtn').disabled=false;};
+        document.getElementById('stopRecBtn').onclick=()=>{isRecording=false;if(isGameMode)stopGameAndSave();mediaRecorder.stop();if(recognition)recognition.stop();document.getElementById('recBtn').disabled=false;document.getElementById('stopRecBtn').disabled=true;};
+        function manualTap(){if(!isRecording)return;if(currentIndex>=wordElements.length)return;const t=(audioEl&&!audioEl.paused)?audioEl.currentTime:(Date.now()-startTime)/1000;const o=wordElements[currentIndex];lrcData.push(`[${formatTime(t)}]${o.fullLine}`);if(currentSongRef){if(!currentSongRef.lrc)currentSongRef.lrc=[];currentSongRef.lrc.push({time:t,text:o.fullLine});}wordElements.forEach(e=>e.element.className="transition-all duration-300 opacity-20 word-done");let hc="s1-active";if(gameType==='DUO'){if(o.fullLine.includes('[2]'))hc="s2-active";if(o.fullLine.includes('[D]'))hc="sd-active";}o.element.className=`word-highlight ${hc} scale-110 opacity-100`;o.element.scrollIntoView({behavior:'smooth',block:'center'});let n=currentIndex+1;while(n<wordElements.length&&wordElements[n].fullLine===o.fullLine)n++;currentIndex=n;}
+        document.body.onkeyup=e=>{if(e.keyCode==32&&syncMode==='manual'&&isRecording)manualTap();};
+
+        // PERSISTENCE
+        function exportConfig(){const d="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify({themeColor:localStorage.getItem('casiLiem_themeColor'),database:db,leaderboard,recentPlayers}));const a=document.createElement('a');a.href=d;a.download="Studio_CasiLiem_v24.json";document.body.appendChild(a);a.click();a.remove();showToast("Config Sauvegardée !");}
+        function importConfig(i){if(i.files[0]){const r=new FileReader();r.onload=e=>{try{const c=JSON.parse(e.target.result);if(c.themeColor)setThemeColor(c.themeColor);if(c.database){db=c.database;updateAlbumSelection();}if(c.leaderboard){leaderboard=c.leaderboard;refreshLeaderboard();}if(c.recentPlayers){recentPlayers=c.recentPlayers;refreshQuickSelect();}showToast("Restauré !");}catch(x){showToast("Erreur Fichier");}};r.readAsText(i.files[0]);}}
+        function showToast(m){const x=document.getElementById("toast");x.textContent=m;x.className="show";setTimeout(()=>x.className=x.className.replace("show",""),3000);}
+        function saveSettings(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+        function loadSettings(){const c=localStorage.getItem('casiLiem_themeColor'),l=localStorage.getItem('casiLiem_leaderboard'),r=localStorage.getItem('casiLiem_recentPlayers');if(c)setThemeColor(c,false);if(l){leaderboard=JSON.parse(l);refreshLeaderboard();}if(r){recentPlayers=JSON.parse(r);refreshQuickSelect();}}
+        function setThemeColor(c,s=true){document.documentElement.style.setProperty('--theme-color',c);if(s)saveSettings('casiLiem_themeColor',c);}
+        function addBotMessage(t){const d=document.createElement('div');d.className='chat-msg msg-bot';d.innerHTML=`<p>${t}</p>`;document.getElementById('chatMessages').appendChild(d);document.getElementById('chatMessages').scrollTop=9999;}
+        function sendUserMessage(t=null){const i=document.getElementById('chatInput'),txt=t||i.value;if(!txt)return;const d=document.createElement('div');d.className='chat-msg msg-user';d.innerText=txt;document.getElementById('chatMessages').appendChild(d);i.value='';document.getElementById('chatMessages').scrollTop=9999;setTimeout(()=>{addBotMessage("Message reçu.");},500);}
+        function handleChatInput(e){if(e.key==='Enter')sendUserMessage();}
+
+        updateAlbumSelection(); loadSettings(); switchTab('sync');
+    </script>
+</body>
+</html>
