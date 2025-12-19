@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CasiLiem Studio Dashboard v24.4 - Pro Live XXL</title>
+    <title>CasiLiem Studio Dashboard v25.0 - Edge Pro XXL</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { 
@@ -18,10 +18,10 @@
         }
         .app-layout { display: flex; height: 100vh; width: 100vw; }
         
-        /* Layout Structure */
+        /* Structure Layout */
         .regie-panel { width: 22%; height: 100%; display: flex; flex-direction: column; padding: 1rem; gap: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.05); overflow-y: auto; }
         .main-workspace { width: 53%; height: 100%; display: flex; flex-direction: column; padding: 1rem; gap: 1rem; position: relative; }
-        .side-panel { width: 25%; height: 100%; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(30px); border-left: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.5); z-index: 30; }
+        .side-panel { width: 25%; height: 100%; background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(40px); border-left: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; box-shadow: -15px 0 45px rgba(0,0,0,0.6); z-index: 30; }
 
         .app-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 6, 23, 0.95); z-index: -1; backdrop-filter: blur(5px); }
         .banner-loaded .app-overlay { background: rgba(2, 6, 23, 0.4); backdrop-filter: blur(3px); }
@@ -29,7 +29,7 @@
         
         .font-studio { font-weight: 900; letter-spacing: -0.05em; text-transform: uppercase; }
         
-        /* KARAOKE XXL STYLES (Accessible) */
+        /* KARAOKE XXL STYLES */
         .word-highlight { font-weight: 900; transform: scale(1.05); display: inline-block; transition: all 0.1s; }
         .s1-active { color: #38bdf8; text-shadow: 0 0 25px #38bdf8; } 
         .s2-active { color: #fb923c; text-shadow: 0 0 25px #fb923c; } 
@@ -42,103 +42,102 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* PITCH & SCORE */
-        .pitch-container { position: relative; height: 70px; width: 100%; background: rgba(0,0,0,0.4); border-radius: 1rem; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        /* PITCH GRAPH */
+        .pitch-container { position: relative; height: 75px; width: 100%; background: rgba(0,0,0,0.5); border-radius: 1rem; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
         #pitchCanvas { width: 100%; height: 100%; }
-        .score-display { position: absolute; top: 10px; right: 20px; font-size: 1.8rem; font-weight: 900; color: #fbbf24; text-shadow: 0 0 15px rgba(251, 191, 36, 0.6); z-index: 20; }
+        .score-display { position: absolute; top: 8px; right: 16px; font-size: 1.5rem; font-weight: 900; color: #fbbf24; text-shadow: 0 0 15px rgba(251, 191, 36, 0.6); z-index: 20; }
         
         :root { --theme-color: #3b82f6; }
         .theme-text { color: var(--theme-color); } .theme-bg { background-color: var(--theme-color); }
-        .btn-primary { background-color: var(--theme-color); color: white; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.1); }
-        .btn-primary:hover { filter: brightness(1.2); transform: scale(0.98); }
+        .btn-primary { background-color: var(--theme-color); color: white; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.15); }
+        .btn-primary:hover { filter: brightness(1.25); transform: scale(0.98); }
         
-        /* CHAT */
-        .chat-msg { margin-bottom: 12px; padding: 10px 14px; border-radius: 12px; animation: popIn 0.3s ease; line-height: 1.4; font-size: 12px; }
-        .msg-bot { background: rgba(255, 255, 255, 0.05); border-left: 3px solid var(--theme-color); color: #e2e8f0; }
-        .msg-user { background: var(--theme-color); color: white; align-self: flex-end; width: 90%; }
+        /* LEADERBOARD & PILLS */
+        .leader-row { display: flex; justify-content: space-between; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .rank-badge { width: 22px; height: 22px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 9px; }
+        .rank-1 { background: #facc15; color: black; box-shadow: 0 0 15px rgba(250, 204, 21, 0.4); }
+
+        .player-pill { padding: 4px 10px; border-radius: 99px; background: rgba(255,255,255,0.05); color: #94a3b8; font-size: 8px; font-weight: 800; text-transform: uppercase; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.1); white-space: nowrap; }
+        .player-pill:hover { background: var(--theme-color); color: white; transform: translateY(-1px); border-color: rgba(255,255,255,0.3); }
         
-        /* TABS */
         .tab-btn.active { background: var(--theme-color); color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
         .tab-btn { flex: 1; padding: 0.6rem; border-radius: 0.8rem; text-align: center; transition: all 0.3s; font-weight: 900; text-transform: uppercase; font-size: 0.65rem; color: #94a3b8; background: rgba(0,0,0,0.2); }
-        
-        /* MEMORY PILLS */
-        .player-pill { padding: 3px 10px; border-radius: 99px; background: rgba(255,255,255,0.05); color: #94a3b8; font-size: 8px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: all 0.2s; border: 1px solid rgba(255,255,255,0.1); white-space: nowrap; }
-        .player-pill:hover { background: var(--theme-color); color: white; transform: translateY(-1px); }
 
         #countdownOverlay {
             position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 14rem; font-weight: 900; color: white;
-            text-shadow: 0 0 80px var(--theme-color, #60a5fa);
+            font-size: 15rem; font-weight: 900; color: white;
+            text-shadow: 0 0 100px var(--theme-color, #60a5fa);
             pointer-events: none; z-index: 100; display: none;
         }
         .countdown-active { display: block !important; }
 
-        .harmony-bar-container { position: relative; height: 8px; background: #0f172a; border-radius: 99px; overflow: hidden; display: flex; border: 1px solid rgba(255,255,255,0.1); }
-        .harmony-indicator { position: absolute; top: -4px; width: 4px; height: 16px; background: white; border-radius: 2px; box-shadow: 0 0 5px white; transition: left 0.15s ease-out; z-index: 20; }
+        .harmony-bar-container { position: relative; height: 10px; background: #0f172a; border-radius: 99px; overflow: hidden; display: flex; border: 1px solid rgba(255,255,255,0.1); }
+        .harmony-indicator { position: absolute; top: -3px; width: 4px; height: 16px; background: white; border-radius: 2px; box-shadow: 0 0 10px white; transition: left 0.15s ease-out; z-index: 20; }
         
-        .security-badge { font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
-        .sec-safe { background: #22c55e; color: black; }
-        .sec-unsafe { background: #ef4444; color: white; }
+        .sec-status { font-size: 8px; font-weight: 900; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; }
+        .status-safe { background: #22c55e; color: black; }
+        .status-unsafe { background: #ef4444; color: white; }
     </style>
 </head>
 <body>
     <div class="app-overlay" id="mainOverlay"></div>
     <div id="toast">Action Confirmée</div>
 
-    <!-- ERROR MODAL -->
+    <!-- ERROR MODAL (Resilient Edge) -->
     <div id="errorModal" class="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 backdrop-blur-md" style="display: none;">
         <div class="glass p-10 rounded-[3rem] max-w-xl w-full text-center border border-red-500/30 shadow-2xl">
-            <h2 class="text-2xl font-black text-white mb-4 uppercase tracking-tighter text-red-500">Flux Audio Bloqué</h2>
-            <p class="text-slate-400 text-sm mb-8 italic">Le navigateur refuse l'accès au micro. Cela arrive si l'adresse n'est pas en HTTPS ou si vous avez cliqué sur "Bloquer" par erreur.</p>
+            <h2 class="text-2xl font-black text-white mb-4 uppercase tracking-tighter text-red-500">Flux Micro Interrompu</h2>
+            <p class="text-slate-400 text-sm mb-8">Edge refuse l'accès au matériel audio.</p>
             
-            <div class="bg-blue-500/10 p-5 rounded-2xl mb-8 text-left border border-blue-500/20">
-                <p class="text-blue-400 font-bold text-xs uppercase mb-3">🛠 Instructions de déblocage :</p>
-                <div class="text-[11px] text-slate-300 space-y-3 leading-relaxed">
-                    <p><b>1.</b> Vérifiez que votre URL commence par <b>https://</b>.</p>
-                    <p><b>2.</b> Cliquez sur le <b>Cadenas</b> à gauche de l'adresse URL.</p>
-                    <p><b>3.</b> Passez l'option <b>Microphone</b> sur <b>Autoriser</b>.</p>
-                    <p><b>4.</b> Rafraîchissez la page (`F5`).</p>
+            <div class="bg-blue-600/10 p-5 rounded-2xl mb-8 text-left border border-blue-500/20">
+                <p class="text-blue-400 font-bold text-xs uppercase mb-3">🚀 Guide de déblocage rapide :</p>
+                <div class="text-[11px] text-slate-300 space-y-4 leading-relaxed">
+                    <p><b>1.</b> Vérifiez le <b>Cadenas</b> à gauche de l'adresse URL.</p>
+                    <p><b>2.</b> Passez l'option <b>Microphone</b> sur <b>Autoriser</b>.</p>
+                    <p><b>3.</b> Si l'option n'apparaît pas, cliquez sur <b>"Paramètres du site"</b> et réinitialisez les autorisations.</p>
+                    <p><b>4.</b> Assurez-vous que l'URL est bien en <b>https://</b>.</p>
                 </div>
             </div>
 
             <div class="flex flex-col gap-3">
-                <button onclick="initAudio()" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg">Retenter la connexion</button>
-                <button onclick="enableSimulation()" class="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-black text-xs uppercase transition-all">Mode Simulation (Sans micro)</button>
+                <button onclick="initAudio()" class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-black text-xs uppercase tracking-widest transition-all shadow-lg">Reconnecter le matériel</button>
+                <button onclick="enableSimulation()" class="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-black text-xs uppercase transition-all">Simulation (Test visuel uniquement)</button>
             </div>
         </div>
     </div>
 
     <div class="app-layout">
         
-        <!-- 1. REGIE (Left) -->
+        <!-- 1. REGIE PANEL (Left - 22%) -->
         <div class="regie-panel no-scrollbar">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center gap-2">
                     <div id="logoBox" class="w-8 h-8 theme-bg rounded-lg flex items-center justify-center shadow-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
                     </div>
-                    <h1 class="text-[10px] font-black text-white uppercase tracking-widest">Studio 24.4</h1>
+                    <h1 class="text-[10px] font-black text-white uppercase tracking-widest">Studio 25.0</h1>
                 </div>
-                <div id="protocolBadge" class="security-badge sec-unsafe">HTTP</div>
+                <div id="protocolBadge" class="sec-status status-unsafe">HTTP</div>
             </div>
 
+            <!-- AUDIO & PROJECTS -->
             <section class="glass p-4 rounded-[1.5rem] border border-white/5 space-y-2">
-                <select id="projectSelector" onchange="updateAlbumSelection()" class="w-full bg-slate-800 border border-slate-700 text-white text-[9px] font-bold py-1.5 px-2 rounded-lg uppercase tracking-widest">
+                <select id="projectSelector" onchange="updateAlbumSelection()" class="w-full bg-slate-800 border border-slate-700 text-white text-[9px] font-bold py-1.5 px-2 rounded-lg outline-none uppercase tracking-widest">
                     <option value="INSIDE_REMIX">INSIDE REMIX</option>
                     <option value="109_AVENUE">109 AVENUE</option>
                     <option value="VIBRATIONS">VIBRATIONS</option>
                 </select>
-                <select id="songSelector" onchange="updateSongSelection()" class="w-full bg-slate-900 border border-slate-700 text-blue-400 text-[9px] font-bold py-1.5 px-2 rounded-lg uppercase tracking-widest">
+                <select id="songSelector" onchange="updateSongSelection()" class="w-full bg-slate-900 border border-slate-700 text-blue-400 text-[9px] font-bold py-1.5 px-2 rounded-lg outline-none uppercase tracking-widest">
                 </select>
-                <button id="masterToggleBtn" onclick="initAudio()" class="w-full py-2.5 btn-primary rounded-xl font-black text-[9px] uppercase shadow-lg">Démarrer Studio</button>
+                <button id="masterToggleBtn" onclick="initAudio()" class="w-full py-2.5 btn-primary rounded-xl font-black text-[9px] uppercase shadow-lg" title="Lancer le micro pour le Karaoké">Démarrer Studio</button>
             </section>
 
-            <!-- PARTICIPANTS AVEC MÉMOIRE -->
+            <!-- CONTEST & MEMORY (5 DERNIERS) -->
             <section class="glass p-4 rounded-[1.5rem] border border-blue-500/20 shadow-lg">
                 <div class="flex justify-between items-center mb-3">
-                    <h2 class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Contest</h2>
+                    <h2 class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Contest Mode</h2>
                     <div class="flex bg-black/40 p-0.5 rounded-lg">
-                        <button onclick="setGameType('SOLO')" id="typeSolo" class="px-2 py-1 rounded text-[7px] font-bold bg-theme-bg text-white">SOLO</button>
+                        <button onclick="setGameType('SOLO')" id="typeSolo" class="px-2 py-1 rounded text-[7px] font-bold bg-theme-bg text-white shadow-lg">SOLO</button>
                         <button onclick="setGameType('DUO')" id="typeDuo" class="px-2 py-1 rounded text-[7px] font-bold text-slate-400">DUO</button>
                     </div>
                 </div>
@@ -154,44 +153,55 @@
                         <div id="p2Recent" class="flex flex-wrap gap-1 mt-2"></div>
                     </div>
                 </div>
-                <div class="mt-4 bg-black/30 p-2 rounded-xl border border-white/5"><div class="flex justify-between items-center"><span class="text-[8px] text-slate-400 font-bold uppercase tracking-widest">Score</span><span id="lastScore" class="text-[10px] text-yellow-400 font-mono font-bold">---</span></div></div>
+                <div class="mt-4 bg-black/30 p-2 rounded-xl border border-white/5"><div class="flex justify-between items-center"><span class="text-[8px] text-slate-400 font-bold uppercase tracking-widest">Score Session</span><span id="lastScore" class="text-[10px] text-yellow-400 font-mono font-bold">---</span></div></div>
             </section>
 
             <!-- HARMONY -->
-            <section class="glass p-4 rounded-[1.5rem] border border-blue-500/20">
-                 <h2 class="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-2 text-center">Harmonie Mix</h2>
+            <section class="glass p-4 rounded-[1.5rem] border border-blue-500/20" title="Balance entre ta voix et la musique (RodeCaster USB)">
+                 <h2 class="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-2 text-center">Harmonie Live</h2>
                  <div class="harmony-bar-container mb-2">
                     <div class="w-[45%] bg-blue-500/20"></div><div class="w-[10%] bg-green-500/30"></div><div class="w-[45%] bg-red-500/20"></div>
                     <div id="harmonyIndicator" class="harmony-indicator" style="left: 50%;"></div>
                 </div>
-                <p id="harmonyAction" class="text-[8px] font-bold text-center text-white/40 uppercase">Analyse active</p>
+                <p id="harmonyAction" class="text-[8px] font-bold text-center text-white/40 uppercase tracking-tighter">Analyse Active</p>
             </section>
 
-            <section class="glass p-4 rounded-[1.5rem] border border-white/10">
-                <h3 class="text-[9px] font-black theme-text uppercase tracking-widest mb-2">Mastering</h3>
+            <!-- MASTERING -->
+            <section class="glass p-4 rounded-[1.5rem] border border-white/10" title="Type de mastering Soundtrap recommandé">
+                <h3 class="text-[9px] font-black theme-text uppercase tracking-widest mb-2">Mastering Soundtrap</h3>
                 <select id="masteringSelector" onchange="updateMasteringAdvice()" class="w-full bg-black/40 border border-white/10 text-white text-[9px] py-1.5 px-2 rounded-lg mb-2">
                     <option value="SUB_BOOST">SUB BOOST</option><option value="PUNCHY">PUNCHY</option><option value="SOFT">SOFT</option><option value="AIR">AIR</option><option value="CLEAN">CLEAN</option>
                 </select>
-                <div id="masteringAdviceBox" class="p-2 bg-white/5 rounded text-[8px] text-slate-400 italic">Cible: 0.69</div>
+                <div id="masteringAdviceBox" class="p-2 bg-white/5 rounded text-[8px] text-slate-400 italic">Cible: 0.69 LUFS</div>
             </section>
 
+            <!-- VISUAL LAB -->
             <section class="glass p-4 rounded-[1.5rem] border border-white/10">
                  <h2 class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 text-center">Visual Lab</h2>
                  <div class="flex gap-2">
                      <div id="imagePreview" class="w-10 h-10 bg-black rounded-lg border border-white/10 flex-shrink-0 overflow-hidden"><img id="resultImg" class="hidden w-full h-full object-cover"></div>
                      <div class="flex-1">
                          <textarea id="promptIn" class="w-full bg-black border border-slate-800 rounded p-1 text-[7px] text-slate-300 h-8 resize-none" placeholder="Prompt..."></textarea>
-                         <button id="genBtn" class="w-full mt-1 py-1 btn-primary font-bold rounded text-[7px] uppercase">Générer</button>
+                         <button id="genBtn" class="w-full mt-1 py-1 btn-primary font-bold rounded text-[7px] uppercase" title="Générer pochette via Imagen">Générer</button>
                      </div>
                  </div>
             </section>
+
+            <!-- EXPORT -->
+            <div class="flex gap-2 mt-auto pt-4 border-t border-white/5">
+                <label class="cursor-pointer flex-1 p-2 rounded-lg bg-slate-800 hover:bg-blue-600 transition-colors flex justify-center items-center" title="Importer Instrumental">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" /></svg>
+                    <input type="file" id="audioUpload" accept="audio/*" class="hidden" onchange="loadAudioFile(this)">
+                </label>
+                <button onclick="exportConfig()" class="flex-1 p-2 rounded-lg bg-slate-800 hover:bg-green-600 transition-colors flex justify-center items-center" title="Tout sauvegarder"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg></button>
+            </div>
         </div>
 
         <!-- 2. MAIN WORKSPACE (Center - 53%) -->
         <div class="main-workspace overflow-hidden">
             <!-- PLAYER BAR -->
             <div id="audioPlayerBar" class="hidden glass p-3 rounded-2xl flex items-center gap-4 border border-white/10 shadow-2xl">
-                <button id="playPauseBtn" class="w-8 h-8 rounded-full theme-bg flex items-center justify-center text-white" onclick="togglePlay()">
+                <button id="playPauseBtn" class="w-8 h-8 rounded-full theme-bg flex items-center justify-center text-white" onclick="togglePlay()" title="Lecture / Pause">
                     <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </button>
@@ -202,8 +212,8 @@
 
             <!-- TABS -->
             <div class="tab-container shadow-lg">
-                <button onclick="switchTab('sync')" id="tab-sync" class="tab-btn active">Mode Spectacle</button>
-                <button onclick="switchTab('compose')" id="tab-compose" class="tab-btn">Mode Composition</button>
+                <button onclick="switchTab('sync')" id="tab-sync" class="tab-btn active" title="Vue Chant XXL">Spectacle</button>
+                <button onclick="switchTab('compose')" id="tab-compose" class="tab-btn" title="Vue Écriture">Composition</button>
             </div>
 
             <!-- KARAOKE SCREEN XXL -->
@@ -211,30 +221,30 @@
                 <section class="glass p-6 rounded-[2.5rem] border border-white/10 h-full flex flex-col theme-shadow relative overflow-hidden">
                     <div id="countdownOverlay"></div>
                     
-                    <div class="flex justify-between items-center mb-4 z-10">
+                    <div class="flex justify-between items-center mb-6 z-10">
                         <div class="flex items-center gap-3">
                             <div class="flex bg-black/40 p-1 rounded-lg">
-                                <button onclick="setSyncMode('voice')" id="modeVoice" class="px-3 py-1 rounded text-[8px] font-bold text-white bg-slate-700 uppercase">Micro</button>
-                                <button onclick="setSyncMode('manual')" id="modeManual" class="px-3 py-1 rounded text-[8px] font-bold text-slate-400 uppercase">Clavier</button>
+                                <button onclick="setSyncMode('voice')" id="modeVoice" class="px-3 py-1 rounded text-[8px] font-bold text-white bg-slate-700 uppercase" title="Sync via détection vocale">Voix</button>
+                                <button onclick="setSyncMode('manual')" id="modeManual" class="px-3 py-1 rounded text-[8px] font-bold text-slate-400 uppercase" title="Sync via clavier">Clavier</button>
                             </div>
-                            <span id="syncStatus" class="hidden text-[9px] font-bold text-green-400 uppercase tracking-widest animate-pulse">● Live Actif</span>
+                            <span id="syncStatus" class="hidden text-[9px] font-bold text-green-400 uppercase tracking-widest animate-pulse">● Live Stream On</span>
                         </div>
                         <div class="flex gap-2">
-                            <button id="recBtn" disabled class="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl text-[10px] uppercase shadow-lg">REC REF</button>
+                            <button id="recBtn" disabled class="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl text-[10px] uppercase shadow-lg" title="Enregistrer pitch guide">REC REF</button>
                             <button id="playGameBtn" disabled class="px-5 py-2.5 bg-green-600 hover:bg-green-500 text-white font-black rounded-xl text-[10px] uppercase shadow-lg" onclick="startGameMode()">JOUER</button>
                             <button id="stopRecBtn" disabled class="px-5 py-2.5 bg-slate-700 text-white font-black rounded-xl text-[10px] uppercase">STOP</button>
                         </div>
                     </div>
                     
-                    <!-- PITCH AREA -->
-                    <div class="pitch-container flex-shrink-0 mb-6 z-10">
+                    <!-- PITCH XXL -->
+                    <div class="pitch-container flex-shrink-0 mb-6 z-10" title="Courbe mélodique">
                         <canvas id="pitchCanvas"></canvas>
                         <div id="scoreDisplay" class="score-display hidden"><span id="scoreVal">0</span> PTS</div>
                     </div>
 
-                    <button id="tapButton" onclick="manualTap()" class="active mb-4 z-10">TAP / ESPACE ICI</button>
+                    <button id="tapButton" onclick="manualTap()" class="active mb-4 z-10" title="Appuyez sur ESPACE au début de chaque ligne chantée">TAP / ESPACE ICI AU DÉBUT DE LA LIGNE</button>
 
-                    <!-- XXL LYRICS AREA -->
+                    <!-- LYRICS AREA XXL -->
                     <div id="lyricContainer" class="flex-1 overflow-y-auto no-scrollbar space-y-16 text-7xl font-black leading-tight text-slate-600 select-none scroll-smooth text-center py-20 z-0">
                     </div>
                 </section>
@@ -244,16 +254,16 @@
             <div id="content-compose" class="hidden h-full">
                 <section class="glass p-6 rounded-[2.5rem] border border-white/10 h-full flex flex-col shadow-2xl">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xs font-black text-white uppercase tracking-[0.4em]">Composition & Rôles</h2>
+                        <h2 class="text-xs font-black text-white uppercase tracking-[0.4em]">Structure & Rôles</h2>
                         <div class="flex bg-black/40 p-1 rounded-lg">
-                            <button onclick="toggleComposeView('text')" id="btnViewText" class="px-3 py-1 text-[9px] font-bold text-slate-400 uppercase">Texte</button>
+                            <button onclick="toggleComposeView('text')" id="btnViewText" class="px-3 py-1 text-[9px] font-bold text-slate-400 uppercase">Texte Brut</button>
                             <button onclick="toggleComposeView('assign')" id="btnViewAssign" class="px-3 py-1 text-[9px] font-bold bg-slate-700 text-white rounded uppercase">Coches</button>
                         </div>
                     </div>
                     <textarea id="composeArea" oninput="saveCurrentLyrics()" class="hidden flex-1 bg-slate-950/50 border border-white/10 rounded-2xl p-6 text-sm text-slate-300 font-mono leading-relaxed focus:outline-none focus:border-white/30 resize-none" placeholder="[1]..."></textarea>
                     <div id="assignContainer" class="flex-1 bg-slate-950/30 border border-white/5 rounded-2xl p-4 overflow-y-auto space-y-1 no-scrollbar"></div>
                     <div class="mt-4 flex justify-end">
-                        <button onclick="transferToKaraoke()" class="px-6 py-3 btn-primary rounded-xl font-black text-[10px] uppercase shadow-lg">Envoyer Spectacle</button>
+                        <button onclick="transferToKaraoke()" class="px-6 py-3 btn-primary rounded-xl font-black text-[10px] uppercase shadow-lg">Charger Spectacle</button>
                     </div>
                 </section>
             </div>
@@ -271,16 +281,16 @@
                 </div>
             </div>
 
-            <!-- LEADERBOARD -->
+            <!-- VIEW 1: LEADERBOARD -->
             <div id="sidebarLeaderboard" class="flex-1 flex flex-col overflow-hidden bg-slate-900/30">
                 <div id="leaderboardList" class="flex-1 overflow-y-auto p-4 no-scrollbar">
                 </div>
             </div>
 
-            <!-- CHATBOT -->
+            <!-- VIEW 2: CHATBOT -->
             <div id="sidebarChatbot" class="hidden flex-1 flex flex-col overflow-hidden">
                 <div id="chatMessages" class="flex-1 overflow-y-auto p-6 flex flex-col gap-4 bg-slate-900/30 no-scrollbar">
-                    <div class="chat-msg msg-bot"><p>Besoin d'aide pour vos paroles ?</p></div>
+                    <div class="chat-msg msg-bot"><p>Salut CasiLiem ! Je t'aide pour tes paroles ?</p></div>
                 </div>
                 <div class="p-6 bg-black/20 border-t border-white/5 backdrop-blur-md">
                     <div class="relative">
@@ -315,32 +325,40 @@
             }
         }
 
-        // --- ROBUST AUDIO INIT ---
+        // --- ROBUST AUDIO INIT (EDGE SPECIAL) ---
         async function initAudio(){
             const errModal = document.getElementById('errorModal');
             const btn = document.getElementById('masterToggleBtn');
-            if(!audioCtx){
-                try{
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(err => { throw new Error("BLOCKED"); });
-                    sourceNode = audioCtx.createMediaStreamSource(stream);
-                    micAnalyser = audioCtx.createAnalyser(); micAnalyser.fftSize = 2048;
-                    sourceNode.connect(micAnalyser);
-                    dataArrayMic = new Uint8Array(micAnalyser.frequencyBinCount);
-                    pitchBuffer = new Uint8Array(micAnalyser.fftSize);
-                    musicAnalyser = audioCtx.createAnalyser(); musicAnalyser.fftSize = 512;
-                    dataArrayMusic = new Uint8Array(musicAnalyser.frequencyBinCount);
-                    mediaRecorder = new MediaRecorder(stream);
-                    mediaRecorder.ondataavailable = e => chunks.push(e.data);
-                    mediaRecorder.onstop = saveRecording;
-                    isRunning = true;
-                    btn.textContent = "PRODUCTION ACTIVE"; btn.classList.replace('bg-blue-600', 'bg-green-600');
-                    errModal.style.display = 'none';
-                    loop();
-                } catch(e) {
-                    errModal.style.display = 'flex';
-                }
-            } else if(audioCtx.state === 'suspended'){ audioCtx.resume(); }
+            
+            // Clean up old context
+            if(audioCtx) {
+                try { await audioCtx.close(); } catch(e){}
+                audioCtx = null;
+            }
+
+            try{
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(err => { throw new Error("BLOCKED"); });
+                
+                sourceNode = audioCtx.createMediaStreamSource(stream);
+                micAnalyser = audioCtx.createAnalyser(); micAnalyser.fftSize = 2048;
+                sourceNode.connect(micAnalyser);
+                dataArrayMic = new Uint8Array(micAnalyser.frequencyBinCount);
+                pitchBuffer = new Uint8Array(micAnalyser.fftSize);
+                musicAnalyser = audioCtx.createAnalyser(); musicAnalyser.fftSize = 512;
+                dataArrayMusic = new Uint8Array(musicAnalyser.frequencyBinCount);
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = e => chunks.push(e.data);
+                mediaRecorder.onstop = saveRecording;
+                
+                isRunning = true;
+                btn.textContent = "PRODUCTION ACTIVE"; btn.classList.replace('bg-blue-600', 'bg-green-600');
+                errModal.style.display = 'none';
+                loop();
+            } catch(e) {
+                console.warn("Edge micro block detected.");
+                errModal.style.display = 'flex';
+            }
         }
 
         function enableSimulation(){ document.getElementById('errorModal').style.display = 'none'; isSimulation = true; isRunning = true; document.getElementById('masterToggleBtn').textContent = "SIMU"; loop(); }
@@ -451,8 +469,8 @@
         function manualTap(){if(!isRecording)return;if(currentIndex>=wordElements.length)return;const t=(audioEl&&!audioEl.paused)?audioEl.currentTime:(Date.now()-startTime)/1000;const o=wordElements[currentIndex];lrcData.push(`[${formatTime(t)}]${o.fullLine}`);if(currentSongRef){if(!currentSongRef.lrc)currentSongRef.lrc=[];currentSongRef.lrc.push({time:t,text:o.fullLine});}wordElements.forEach(e=>e.element.className="transition-all duration-300 opacity-20 word-done");let hc="s1-active";if(gameType==='DUO'){if(o.fullLine.includes('[2]'))hc="s2-active";if(o.fullLine.includes('[D]'))hc="sd-active";}o.element.className=`word-highlight ${hc} scale-110 opacity-100`;o.element.scrollIntoView({behavior:'smooth',block:'center'});let n=currentIndex+1;while(n<wordElements.length&&wordElements[n].fullLine===o.fullLine)n++;currentIndex=n;}
         document.body.onkeyup=e=>{if(e.keyCode==32&&syncMode==='manual'&&isRecording)manualTap();};
 
-        // --- UTILS ---
-        function exportConfig(){const d="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify({themeColor:localStorage.getItem('casiLiem_themeColor'),database:db,leaderboard,recentPlayers}));const a=document.createElement('a');a.href=d;a.download="Studio_CasiLiem_v24.json";document.body.appendChild(a);a.click();a.remove();showToast("Configuration Sauvegardée !");}
+        // --- PERSISTENCE ---
+        function exportConfig(){const d="data:text/json;charset=utf-8,"+encodeURIComponent(JSON.stringify({themeColor:localStorage.getItem('casiLiem_themeColor'),database:db,leaderboard,recentPlayers}));const a=document.createElement('a');a.href=d;a.download="Studio_CasiLiem_v25.json";document.body.appendChild(a);a.click();a.remove();showToast("Configuration Sauvegardée !");}
         function importConfig(i){if(i.files[0]){const r=new FileReader();r.onload=e=>{try{const c=JSON.parse(e.target.result);if(c.themeColor)setThemeColor(c.themeColor);if(c.database){db=c.database;updateAlbumSelection();}if(c.leaderboard){leaderboard=c.leaderboard;refreshLeaderboard();}if(c.recentPlayers){recentPlayers=c.recentPlayers;refreshQuickSelect();}showToast("Restauré !");}catch(x){showToast("Erreur Fichier");}};r.readAsText(i.files[0]);}}
         function showToast(m){const x=document.getElementById("toast");x.textContent=m;x.className="show";setTimeout(()=>x.className=x.className.replace("show",""),3000);}
         function saveSettings(k,v){try{localStorage.setItem(k,v)}catch(e){}}
