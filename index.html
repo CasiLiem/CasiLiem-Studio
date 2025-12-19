@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CasiLiem Studio Dashboard v24.3 - Master Live XXL</title>
+    <title>CasiLiem Studio Dashboard v24.4 - Pro Live XXL</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { 
@@ -18,7 +18,7 @@
         }
         .app-layout { display: flex; height: 100vh; width: 100vw; }
         
-        /* Structure de l'interface */
+        /* Layout Structure */
         .regie-panel { width: 22%; height: 100%; display: flex; flex-direction: column; padding: 1rem; gap: 1rem; border-right: 1px solid rgba(255, 255, 255, 0.05); overflow-y: auto; }
         .main-workspace { width: 53%; height: 100%; display: flex; flex-direction: column; padding: 1rem; gap: 1rem; position: relative; }
         .side-panel { width: 25%; height: 100%; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(30px); border-left: 1px solid rgba(255, 255, 255, 0.1); display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.5); z-index: 30; }
@@ -31,9 +31,9 @@
         
         /* KARAOKE XXL STYLES (Accessible) */
         .word-highlight { font-weight: 900; transform: scale(1.05); display: inline-block; transition: all 0.1s; }
-        .s1-active { color: #38bdf8; text-shadow: 0 0 25px #38bdf8; } /* Cyan */
-        .s2-active { color: #fb923c; text-shadow: 0 0 25px #fb923c; } /* Orange */
-        .sd-active { color: #facc15; text-shadow: 0 0 25px #facc15; } /* Jaune */
+        .s1-active { color: #38bdf8; text-shadow: 0 0 25px #38bdf8; } 
+        .s2-active { color: #fb923c; text-shadow: 0 0 25px #fb923c; } 
+        .sd-active { color: #facc15; text-shadow: 0 0 25px #facc15; } 
         .s1-pending { color: #0c4a6e; opacity: 0.8; } 
         .s2-pending { color: #7c2d12; opacity: 0.8; }
         .sd-pending { color: #713f12; opacity: 0.8; }
@@ -57,11 +57,6 @@
         .msg-bot { background: rgba(255, 255, 255, 0.05); border-left: 3px solid var(--theme-color); color: #e2e8f0; }
         .msg-user { background: var(--theme-color); color: white; align-self: flex-end; width: 90%; }
         
-        /* LEADERBOARD */
-        .leader-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .rank-badge { width: 22px; height: 22px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 9px; }
-        .rank-1 { background: #facc15; color: black; box-shadow: 0 0 15px rgba(250, 204, 21, 0.4); }
-
         /* TABS */
         .tab-btn.active { background: var(--theme-color); color: white; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
         .tab-btn { flex: 1; padding: 0.6rem; border-radius: 0.8rem; text-align: center; transition: all 0.3s; font-weight: 900; text-transform: uppercase; font-size: 0.65rem; color: #94a3b8; background: rgba(0,0,0,0.2); }
@@ -94,14 +89,15 @@
     <div id="errorModal" class="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 backdrop-blur-md" style="display: none;">
         <div class="glass p-10 rounded-[3rem] max-w-xl w-full text-center border border-red-500/30 shadow-2xl">
             <h2 class="text-2xl font-black text-white mb-4 uppercase tracking-tighter text-red-500">Flux Audio Bloqué</h2>
-            <p class="text-slate-400 text-sm mb-8 italic">Le navigateur refuse l'accès au micro car l'adresse n'est pas considérée comme sécurisée.</p>
+            <p class="text-slate-400 text-sm mb-8 italic">Le navigateur refuse l'accès au micro. Cela arrive si l'adresse n'est pas en HTTPS ou si vous avez cliqué sur "Bloquer" par erreur.</p>
             
             <div class="bg-blue-500/10 p-5 rounded-2xl mb-8 text-left border border-blue-500/20">
                 <p class="text-blue-400 font-bold text-xs uppercase mb-3">🛠 Instructions de déblocage :</p>
                 <div class="text-[11px] text-slate-300 space-y-3 leading-relaxed">
                     <p><b>1.</b> Vérifiez que votre URL commence par <b>https://</b>.</p>
-                    <p><b>2.</b> Cliquez sur le <b>Cadenas</b> à gauche de l'adresse et passez Micro sur <b>Autoriser</b>.</p>
-                    <p><b>3.</b> Si vous êtes sur GitHub, attendez 30s après le commit avant de rafraîchir.</p>
+                    <p><b>2.</b> Cliquez sur le <b>Cadenas</b> à gauche de l'adresse URL.</p>
+                    <p><b>3.</b> Passez l'option <b>Microphone</b> sur <b>Autoriser</b>.</p>
+                    <p><b>4.</b> Rafraîchissez la page (`F5`).</p>
                 </div>
             </div>
 
@@ -114,19 +110,18 @@
 
     <div class="app-layout">
         
-        <!-- 1. REGIE (Left - 22%) -->
+        <!-- 1. REGIE (Left) -->
         <div class="regie-panel no-scrollbar">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center gap-2">
                     <div id="logoBox" class="w-8 h-8 theme-bg rounded-lg flex items-center justify-center shadow-lg">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
                     </div>
-                    <h1 class="text-[10px] font-black text-white uppercase">Studio 24.3</h1>
+                    <h1 class="text-[10px] font-black text-white uppercase tracking-widest">Studio 24.4</h1>
                 </div>
                 <div id="protocolBadge" class="security-badge sec-unsafe">HTTP</div>
             </div>
 
-            <!-- PROJET -->
             <section class="glass p-4 rounded-[1.5rem] border border-white/5 space-y-2">
                 <select id="projectSelector" onchange="updateAlbumSelection()" class="w-full bg-slate-800 border border-slate-700 text-white text-[9px] font-bold py-1.5 px-2 rounded-lg uppercase tracking-widest">
                     <option value="INSIDE_REMIX">INSIDE REMIX</option>
@@ -135,15 +130,15 @@
                 </select>
                 <select id="songSelector" onchange="updateSongSelection()" class="w-full bg-slate-900 border border-slate-700 text-blue-400 text-[9px] font-bold py-1.5 px-2 rounded-lg uppercase tracking-widest">
                 </select>
-                <button id="masterToggleBtn" onclick="initAudio()" class="w-full py-2.5 btn-primary rounded-xl font-black text-[9px] uppercase shadow-lg" title="Cliquer pour activer le micro RodeCaster">Démarrer Studio</button>
+                <button id="masterToggleBtn" onclick="initAudio()" class="w-full py-2.5 btn-primary rounded-xl font-black text-[9px] uppercase shadow-lg">Démarrer Studio</button>
             </section>
 
-            <!-- PARTICIPANTS & MEMORY (5 DERNIERS) -->
+            <!-- PARTICIPANTS AVEC MÉMOIRE -->
             <section class="glass p-4 rounded-[1.5rem] border border-blue-500/20 shadow-lg">
                 <div class="flex justify-between items-center mb-3">
-                    <h2 class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Participants</h2>
-                    <div class="flex bg-black/40 p-0.5 rounded-lg" title="Nombre de joueurs">
-                        <button onclick="setGameType('SOLO')" id="typeSolo" class="px-2 py-1 rounded text-[7px] font-bold bg-theme-bg text-white shadow-lg">SOLO</button>
+                    <h2 class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Contest</h2>
+                    <div class="flex bg-black/40 p-0.5 rounded-lg">
+                        <button onclick="setGameType('SOLO')" id="typeSolo" class="px-2 py-1 rounded text-[7px] font-bold bg-theme-bg text-white">SOLO</button>
                         <button onclick="setGameType('DUO')" id="typeDuo" class="px-2 py-1 rounded text-[7px] font-bold text-slate-400">DUO</button>
                     </div>
                 </div>
@@ -163,32 +158,30 @@
             </section>
 
             <!-- HARMONY -->
-            <section class="glass p-4 rounded-[1.5rem] border border-blue-500/20" title="Équilibre entre ta voix et la musique">
-                 <h2 class="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-2 text-center">Harmonie</h2>
+            <section class="glass p-4 rounded-[1.5rem] border border-blue-500/20">
+                 <h2 class="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-2 text-center">Harmonie Mix</h2>
                  <div class="harmony-bar-container mb-2">
                     <div class="w-[45%] bg-blue-500/20"></div><div class="w-[10%] bg-green-500/30"></div><div class="w-[45%] bg-red-500/20"></div>
                     <div id="harmonyIndicator" class="harmony-indicator" style="left: 50%;"></div>
                 </div>
-                <p id="harmonyAction" class="text-[8px] font-bold text-center text-white/40 uppercase tracking-tighter italic">Analyse en cours...</p>
+                <p id="harmonyAction" class="text-[8px] font-bold text-center text-white/40 uppercase">Analyse active</p>
             </section>
 
-            <!-- MASTERING -->
             <section class="glass p-4 rounded-[1.5rem] border border-white/10">
-                <h3 class="text-[9px] font-black theme-text uppercase tracking-widest mb-2">Mastering Advice</h3>
+                <h3 class="text-[9px] font-black theme-text uppercase tracking-widest mb-2">Mastering</h3>
                 <select id="masteringSelector" onchange="updateMasteringAdvice()" class="w-full bg-black/40 border border-white/10 text-white text-[9px] py-1.5 px-2 rounded-lg mb-2">
                     <option value="SUB_BOOST">SUB BOOST</option><option value="PUNCHY">PUNCHY</option><option value="SOFT">SOFT</option><option value="AIR">AIR</option><option value="CLEAN">CLEAN</option>
                 </select>
                 <div id="masteringAdviceBox" class="p-2 bg-white/5 rounded text-[8px] text-slate-400 italic">Cible: 0.69</div>
             </section>
 
-            <!-- VISUAL LAB -->
             <section class="glass p-4 rounded-[1.5rem] border border-white/10">
                  <h2 class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 text-center">Visual Lab</h2>
                  <div class="flex gap-2">
                      <div id="imagePreview" class="w-10 h-10 bg-black rounded-lg border border-white/10 flex-shrink-0 overflow-hidden"><img id="resultImg" class="hidden w-full h-full object-cover"></div>
                      <div class="flex-1">
                          <textarea id="promptIn" class="w-full bg-black border border-slate-800 rounded p-1 text-[7px] text-slate-300 h-8 resize-none" placeholder="Prompt..."></textarea>
-                         <button id="genBtn" class="w-full mt-1 py-1 btn-primary font-bold rounded text-[7px] uppercase" title="Générer art via IA">Générer</button>
+                         <button id="genBtn" class="w-full mt-1 py-1 btn-primary font-bold rounded text-[7px] uppercase">Générer</button>
                      </div>
                  </div>
             </section>
@@ -197,7 +190,7 @@
         <!-- 2. MAIN WORKSPACE (Center - 53%) -->
         <div class="main-workspace overflow-hidden">
             <!-- PLAYER BAR -->
-            <div id="audioPlayerBar" class="hidden glass p-3 rounded-2xl flex items-center gap-4 border border-white/10">
+            <div id="audioPlayerBar" class="hidden glass p-3 rounded-2xl flex items-center gap-4 border border-white/10 shadow-2xl">
                 <button id="playPauseBtn" class="w-8 h-8 rounded-full theme-bg flex items-center justify-center text-white" onclick="togglePlay()">
                     <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -208,39 +201,38 @@
             </div>
 
             <!-- TABS -->
-            <div class="tab-container">
-                <button onclick="switchTab('sync')" id="tab-sync" class="tab-btn active" title="Vue Chant">Mode Spectacle</button>
-                <button onclick="switchTab('compose')" id="tab-compose" class="tab-btn" title="Vue Écriture">Mode Composition</button>
+            <div class="tab-container shadow-lg">
+                <button onclick="switchTab('sync')" id="tab-sync" class="tab-btn active">Mode Spectacle</button>
+                <button onclick="switchTab('compose')" id="tab-compose" class="tab-btn">Mode Composition</button>
             </div>
 
-            <!-- KARAOKE FULL SCREEN -->
+            <!-- KARAOKE SCREEN XXL -->
             <div id="content-sync" class="block flex-1 relative overflow-hidden">
                 <section class="glass p-6 rounded-[2.5rem] border border-white/10 h-full flex flex-col theme-shadow relative overflow-hidden">
                     <div id="countdownOverlay"></div>
                     
-                    <!-- Top Controls -->
                     <div class="flex justify-between items-center mb-4 z-10">
                         <div class="flex items-center gap-3">
                             <div class="flex bg-black/40 p-1 rounded-lg">
-                                <button onclick="setSyncMode('voice')" id="modeVoice" class="px-3 py-1 rounded text-[8px] font-bold text-white bg-slate-700 uppercase" title="Synchronisation par reconnaissance vocale">Voix</button>
-                                <button onclick="setSyncMode('manual')" id="modeManual" class="px-3 py-1 rounded text-[8px] font-bold text-slate-400 uppercase" title="Synchronisation par barre espace">Clavier</button>
+                                <button onclick="setSyncMode('voice')" id="modeVoice" class="px-3 py-1 rounded text-[8px] font-bold text-white bg-slate-700 uppercase">Micro</button>
+                                <button onclick="setSyncMode('manual')" id="modeManual" class="px-3 py-1 rounded text-[8px] font-bold text-slate-400 uppercase">Clavier</button>
                             </div>
-                            <span id="syncStatus" class="hidden text-[9px] font-bold text-green-400 uppercase tracking-widest animate-pulse">● Connecté</span>
+                            <span id="syncStatus" class="hidden text-[9px] font-bold text-green-400 uppercase tracking-widest animate-pulse">● Live Actif</span>
                         </div>
                         <div class="flex gap-2">
-                            <button id="recBtn" disabled class="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl text-[10px] uppercase shadow-lg" title="Enregistrer la courbe mélodique guide">REC REF</button>
-                            <button id="playGameBtn" disabled class="px-5 py-2.5 bg-green-600 hover:bg-green-500 text-white font-black rounded-xl text-[10px] uppercase shadow-lg" onclick="startGameMode()" title="Lancer une session avec score">JOUER</button>
-                            <button id="stopRecBtn" disabled class="px-5 py-2.5 bg-slate-700 text-white font-black rounded-xl text-[10px] uppercase" title="Tout stopper">STOP</button>
+                            <button id="recBtn" disabled class="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl text-[10px] uppercase shadow-lg">REC REF</button>
+                            <button id="playGameBtn" disabled class="px-5 py-2.5 bg-green-600 hover:bg-green-500 text-white font-black rounded-xl text-[10px] uppercase shadow-lg" onclick="startGameMode()">JOUER</button>
+                            <button id="stopRecBtn" disabled class="px-5 py-2.5 bg-slate-700 text-white font-black rounded-xl text-[10px] uppercase">STOP</button>
                         </div>
                     </div>
                     
-                    <!-- XXL PITCH -->
-                    <div class="pitch-container flex-shrink-0 mb-6 z-10" title="Visualisation de ton chant">
+                    <!-- PITCH AREA -->
+                    <div class="pitch-container flex-shrink-0 mb-6 z-10">
                         <canvas id="pitchCanvas"></canvas>
                         <div id="scoreDisplay" class="score-display hidden"><span id="scoreVal">0</span> PTS</div>
                     </div>
 
-                    <button id="tapButton" onclick="manualTap()" class="active mb-4 z-10" title="Appuyez sur ESPACE au début de chaque ligne chantée">TAP / ESPACE ICI AU DÉBUT DE LA LIGNE</button>
+                    <button id="tapButton" onclick="manualTap()" class="active mb-4 z-10">TAP / ESPACE ICI</button>
 
                     <!-- XXL LYRICS AREA -->
                     <div id="lyricContainer" class="flex-1 overflow-y-auto no-scrollbar space-y-16 text-7xl font-black leading-tight text-slate-600 select-none scroll-smooth text-center py-20 z-0">
@@ -250,25 +242,25 @@
 
             <!-- COMPOSITION AREA -->
             <div id="content-compose" class="hidden h-full">
-                <section class="glass p-6 rounded-[2.5rem] border border-white/10 h-full flex flex-col">
+                <section class="glass p-6 rounded-[2.5rem] border border-white/10 h-full flex flex-col shadow-2xl">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xs font-black text-white uppercase tracking-[0.4em]">Structure & Rôles</h2>
+                        <h2 class="text-xs font-black text-white uppercase tracking-[0.4em]">Composition & Rôles</h2>
                         <div class="flex bg-black/40 p-1 rounded-lg">
-                            <button onclick="toggleComposeView('text')" id="btnViewText" class="px-3 py-1 text-[9px] font-bold text-slate-400 uppercase">Brut</button>
+                            <button onclick="toggleComposeView('text')" id="btnViewText" class="px-3 py-1 text-[9px] font-bold text-slate-400 uppercase">Texte</button>
                             <button onclick="toggleComposeView('assign')" id="btnViewAssign" class="px-3 py-1 text-[9px] font-bold bg-slate-700 text-white rounded uppercase">Coches</button>
                         </div>
                     </div>
                     <textarea id="composeArea" oninput="saveCurrentLyrics()" class="hidden flex-1 bg-slate-950/50 border border-white/10 rounded-2xl p-6 text-sm text-slate-300 font-mono leading-relaxed focus:outline-none focus:border-white/30 resize-none" placeholder="[1]..."></textarea>
                     <div id="assignContainer" class="flex-1 bg-slate-950/30 border border-white/5 rounded-2xl p-4 overflow-y-auto space-y-1 no-scrollbar"></div>
                     <div class="mt-4 flex justify-end">
-                        <button onclick="transferToKaraoke()" class="px-6 py-3 btn-primary rounded-xl font-black text-[10px] uppercase shadow-lg">Charger Spectacle</button>
+                        <button onclick="transferToKaraoke()" class="px-6 py-3 btn-primary rounded-xl font-black text-[10px] uppercase shadow-lg">Envoyer Spectacle</button>
                     </div>
                 </section>
             </div>
         </div>
 
         <!-- 3. SIDEBAR (Right - 25%) -->
-        <div class="side-panel">
+        <div class="side-panel shadow-2xl">
             <div class="p-6 theme-bg flex items-center justify-between shadow-lg z-20">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg></div>
@@ -279,20 +271,20 @@
                 </div>
             </div>
 
-            <!-- VIEW 1: LEADERBOARD -->
+            <!-- LEADERBOARD -->
             <div id="sidebarLeaderboard" class="flex-1 flex flex-col overflow-hidden bg-slate-900/30">
                 <div id="leaderboardList" class="flex-1 overflow-y-auto p-4 no-scrollbar">
                 </div>
             </div>
 
-            <!-- VIEW 2: CHATBOT -->
+            <!-- CHATBOT -->
             <div id="sidebarChatbot" class="hidden flex-1 flex flex-col overflow-hidden">
                 <div id="chatMessages" class="flex-1 overflow-y-auto p-6 flex flex-col gap-4 bg-slate-900/30 no-scrollbar">
-                    <div class="chat-msg msg-bot"><p>Salut CasiLiem ! Je t'aide pour tes paroles ?</p></div>
+                    <div class="chat-msg msg-bot"><p>Besoin d'aide pour vos paroles ?</p></div>
                 </div>
                 <div class="p-6 bg-black/20 border-t border-white/5 backdrop-blur-md">
                     <div class="relative">
-                        <input type="text" id="chatInput" placeholder="Message..." class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 pr-12 text-xs font-bold text-white outline-none focus:border-white/30 transition-all font-studio" onkeypress="handleChatInput(event)">
+                        <input type="text" id="chatInput" placeholder="Écris ici..." class="w-full bg-white/5 border border-white/10 rounded-2xl p-4 pr-12 text-xs font-bold text-white outline-none focus:border-white/30 transition-all font-studio" onkeypress="handleChatInput(event)">
                         <button onclick="sendUserMessage()" class="absolute right-2 top-2 p-2 text-slate-400 hover:text-white transition-colors" title="Envoyer"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg></button>
                     </div>
                 </div>
@@ -342,7 +334,7 @@
                     mediaRecorder.ondataavailable = e => chunks.push(e.data);
                     mediaRecorder.onstop = saveRecording;
                     isRunning = true;
-                    btn.textContent = "STUDIO ACTIF"; btn.classList.replace('bg-blue-600', 'bg-green-600');
+                    btn.textContent = "PRODUCTION ACTIVE"; btn.classList.replace('bg-blue-600', 'bg-green-600');
                     errModal.style.display = 'none';
                     loop();
                 } catch(e) {
@@ -423,7 +415,7 @@
             let tot=ml+mul, bal=50; if(tot>10)bal=(ml/tot)*100;
             document.getElementById('harmonyIndicator').style.left=bal+"%";
             const ha=document.getElementById('harmonyAction');
-            if(tot<10)ha.textContent="Analyse..."; else if(bal>40&&bal<60)ha.textContent="Équilibre OK"; else if(bal<=40)ha.textContent="Voix trop faible"; else ha.textContent="Voix trop forte";
+            if(tot<10)ha.textContent="Spectateur"; else if(bal>40&&bal<60)ha.textContent="Équilibre OK"; else if(bal<=40)ha.textContent="Voix trop faible"; else ha.textContent="Voix trop forte";
         }
 
         // --- CONTEST & SCORES ---
