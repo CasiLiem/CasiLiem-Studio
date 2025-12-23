@@ -3,104 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CasiLiem Studio Dashboard v68.0</title>
+    <title>CasiLiem Studio Dashboard v68.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { 
-            --neon-color: #3b82f6; 
-            --neon-intensity: 35px; 
-            --bg-image: url('CasiLiem_Universe_Background.jpg'); 
-        }
-        
-        body { 
-            background-color: #020617; 
-            color: #f8fafc; 
-            font-family: 'Inter', sans-serif; 
-            height: 100vh; 
-            width: 100vw; 
-            overflow: hidden; 
-            position: relative; 
-            display: flex;
-            flex-direction: column;
-        }
-
-        body::before { 
-            content: ""; 
-            position: fixed; 
-            top: 0; left: 0; width: 100%; height: 100%; 
-            background-image: var(--bg-image); 
-            background-size: cover; 
-            background-position: center; 
-            opacity: 0.35; 
-            z-index: -1; 
-        }
-
+        :root { --neon-color: #3b82f6; --neon-intensity: 35px; --bg-image: url('CasiLiem_Universe_Background.jpg'); }
+        body { background-color: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; height: 100vh; width: 100vw; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+        body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: var(--bg-image); background-size: cover; background-position: center; opacity: 0.35; z-index: -1; }
         .glass { background: rgba(7, 10, 18, 0.8); backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.05); }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
         .section-tag { font-size: 0.6rem; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.7; }
-        
-        .tab-btn {
-            padding: 0.8rem 1.2rem; font-size: 0.6rem; font-weight: 900;
-            text-transform: uppercase; letter-spacing: 0.15em; border-bottom: 2px solid transparent;
-            transition: all 0.3s; opacity: 0.4; cursor: pointer;
-        }
-        .tab-btn.active {
-            opacity: 1; border-color: var(--neon-color); color: var(--neon-color);
-            text-shadow: 0 0 10px var(--neon-color);
-        }
-
+        .tab-btn { padding: 0.8rem 1.2rem; font-size: 0.6rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; border-bottom: 2px solid transparent; transition: all 0.3s; opacity: 0.4; cursor: pointer; }
+        .tab-btn.active { opacity: 1; border-color: var(--neon-color); color: var(--neon-color); text-shadow: 0 0 10px var(--neon-color); }
         .tab-content { display: none; height: 100%; width: 100%; overflow: hidden; }
         .tab-content.active { display: flex !important; }
-
-        #centerNotification {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--neon-color); color: white; padding: 10px 30px;
-            border-radius: 50px; font-weight: 900; font-size: 0.7rem; letter-spacing: 0.2em;
-            z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s;
-            box-shadow: 0 0 20px var(--neon-color);
-        }
+        #centerNotification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--neon-color); color: white; padding: 10px 30px; border-radius: 50px; font-weight: 900; font-size: 0.7rem; letter-spacing: 0.2em; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; box-shadow: 0 0 20px var(--neon-color); }
         #centerNotification.show { opacity: 1; transform: translateX(-50%) translateY(10px); }
-
-        .btn-cockpit {
-            width: 100%; padding: 1.5rem 1rem; border-radius: 1.2rem; font-weight: 900;
-            text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.2em;
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
-            color: white; transition: all 0.3s; text-align: center; cursor: pointer;
-        }
-        .btn-cockpit:hover { background: var(--neon-color); box-shadow: 0 0 var(--neon-intensity) var(--neon-color); transform: scale(1.02); }
-
         .interactive-zone { position: relative; border-radius: 1.2rem; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.3s; }
         .interactive-zone:hover { border-color: var(--neon-color); box-shadow: 0 0 var(--neon-intensity) var(--neon-color); }
-
         textarea, input { background: transparent !important; border: none !important; width: 100%; outline: none; padding: 1rem; font-size: 0.9rem; color: white; }
         select { background-color: #000000 !important; border: none !important; width: 100%; outline: none; padding: 0.8rem 1rem; font-size: 0.8rem; color: white; appearance: none; border-radius: 0.8rem; cursor: pointer; }
-
         .btn-action { padding: 0.8rem 1.2rem; border-radius: 0.8rem; font-weight: 800; text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.1em; transition: all 0.2s; cursor: pointer; border: none; color: white; }
-
-        .suno-lyrics-canvas { font-size: 0.85rem; font-weight: 800; line-height: 1.4; color: #ffffff; white-space: pre-wrap; padding-bottom: 100px; columns: 2; column-gap: 4rem; column-rule: 1px solid rgba(255,255,255,0.05); overflow-y: auto; }
-
-        .banner-container { width: 100%; height: 180px; border-radius: 2rem; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.4); }
-        .banner-img { width: 100%; height: 100%; object-fit: cover; }
-        .banner-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); display: flex; align-items: flex-end; padding: 20px; }
-        
-        input[type=range] { height: 4px; -webkit-appearance: none; background: rgba(255,255,255,0.1); border-radius: 5px; outline: none; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: var(--neon-color); border-radius: 50%; border: 2px solid white; cursor: pointer; }
-
-        /* Styles Spécifiques Drag & Drop */
-        .drag-active { border-color: var(--neon-color) !important; background: rgba(59, 130, 246, 0.1) !important; transform: scale(0.99); }
+        .suno-lyrics-canvas { font-size: 0.85rem; font-weight: 800; line-height: 1.4; color: #ffffff; white-space: pre-wrap; padding-bottom: 100px; columns: 2; column-gap: 4rem; overflow-y: auto; }
     </style>
 </head>
 <body>
-
     <div id="centerNotification"></div>
-
     <div class="glass border-b border-white/5 p-3 flex justify-between items-center px-6 z-50 shrink-0">
         <div class="flex items-center gap-6">
             <div class="flex items-center gap-3 pr-4 border-r border-white/10">
                 <h1 class="text-xs font-black uppercase tracking-widest text-white">CasiLiem Studio</h1>
-                <p class="text-[8px] text-slate-500 uppercase font-bold italic tracking-widest">v68.0 Pure Karaoke</p>
+                <p id="storageIndicator" class="text-[8px] text-slate-500 uppercase font-bold italic tracking-widest">v68.5 GitHub Edition</p>
             </div>
             <nav class="flex gap-1">
                 <button onclick="switchTab('discographie')" id="tab-discographie" class="tab-btn active">📂 Discographie</button>
@@ -108,41 +41,19 @@
                 <button onclick="switchTab('studio')" id="tab-studio" class="tab-btn">🎙️ Studio Hub</button>
             </nav>
         </div>
-        <div class="flex items-center gap-2">
-            <label class="section-tag">Néon</label>
-            <input type="color" id="neonPicker" oninput="previewNeonColor(this.value)" class="w-6 h-6 p-0 rounded-lg border-none bg-transparent cursor-pointer">
-            <button onclick="confirmNeonColor()" class="btn-action bg-emerald-600/20 text-emerald-400 py-1 px-3 text-[10px]">V</button>
+        <div class="flex items-center gap-4">
+            <button id="linkFileBtn" onclick="initFileHandle()" class="btn-action bg-amber-600/40 text-amber-200 border border-amber-500/30 text-[9px]">🔗 Lier JSON PC (HTTPS OK)</button>
+            <button onclick="confirmNeonColor()" class="btn-action bg-emerald-600/20 text-emerald-400 py-1 px-3 text-[10px]">SAVE STYLE</button>
         </div>
     </div>
 
     <div class="flex-1 relative overflow-hidden">
-        
         <div id="content-discographie" class="tab-content active flex-col">
             <div class="p-8 pb-4 shrink-0 space-y-6">
-                <div class="max-w-7xl mx-auto w-full space-y-6">
-                    <div class="banner-container group relative">
-                        <img id="displayBanner" src="" class="banner-img" onerror="this.src='https://via.placeholder.com/1200x200/020617/3b82f6?text=CasiLiem+Universe'">
-                        <div class="banner-overlay">
-                            <div class="flex justify-between items-end w-full">
-                                <div class="flex flex-col gap-1">
-                                    <h2 class="section-tag text-blue-500 text-2xl font-black italic tracking-[0.4em]">DISCOGRAPHIE</h2>
-                                    <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Pure Karaoke Management System</p>
-                                </div>
-                                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onclick="document.getElementById('bannerInput').click()" class="btn-action bg-white/10 hover:bg-white/20 text-[9px]">Changer Bannière</button>
-                                    <button id="validateBannerBtn" onclick="saveBanner()" class="btn-action bg-emerald-600/40 hover:bg-emerald-600 hidden text-[9px]">Valider</button>
-                                </div>
-                            </div>
-                        </div>
-                        <input type="file" id="bannerInput" class="hidden" accept="image/*" onchange="previewBanner(this)">
-                    </div>
-
-                    <div class="flex justify-between items-center bg-black/40 p-4 rounded-2xl border border-white/5 shadow-xl">
-                        <select id="albumFilter" onchange="displayGlobalAlbumsOverview()" class="py-1 px-3 text-[10px] font-bold min-w-48 uppercase bg-black text-white rounded-lg border border-white/10"><option value="">-- Tous les Albums --</option></select>
-                        <div class="flex gap-3">
-                            <button onclick="document.getElementById('importFile').click()" class="btn-action bg-blue-900/40 border border-blue-500/30 text-blue-400 text-[9px]">Restaurer Pack DATA</button>
-                            <button onclick="generateMasterDataPacket()" class="btn-action bg-purple-900/40 border border-purple-500/30 text-purple-400 text-[9px]">Générer Pack DATA</button>
-                        </div>
+                <div class="max-w-7xl mx-auto w-full flex justify-between items-center bg-black/40 p-4 rounded-2xl border border-white/5">
+                    <select id="albumFilter" onchange="displayGlobalAlbumsOverview()" class="py-1 px-3 text-[10px] font-bold min-w-48 uppercase bg-black text-white rounded-lg border border-white/10"><option value="">-- Tous les Albums --</option></select>
+                    <div class="flex gap-3">
+                        <button onclick="document.getElementById('importFile').click()" class="btn-action bg-blue-900/40 border border-blue-500/30 text-blue-400 text-[9px]">Restaurer JSON</button>
                     </div>
                 </div>
             </div>
@@ -154,140 +65,56 @@
         </div>
 
         <div id="content-karaoke" class="tab-content bg-black/60 flex-col">
-             <div class="p-6 border-b border-white/5 flex justify-between items-center bg-black/40 shrink-0">
-                <div class="flex items-center gap-6">
-                    <h2 class="section-tag text-blue-500 text-2xl font-black italic tracking-[0.3em]">KARAOKE LAB</h2>
-                    <div id="karaokeCurrentTitle" class="px-6 py-2 glass rounded-xl border border-blue-500/30 text-blue-400 font-black uppercase text-xs">Aucun Titre Sélectionné</div>
-                </div>
+            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-black/40 shrink-0">
+                <h2 class="section-tag text-blue-500 text-2xl font-black italic tracking-[0.3em]">KARAOKE LAB</h2>
+                <div id="karaokeCurrentTitle" class="px-6 py-2 glass rounded-xl border border-blue-500/30 text-blue-400 font-black uppercase text-xs">Aucun Titre</div>
             </div>
             <div class="flex-1 flex flex-row overflow-hidden">
-                <div id="karaokeDropZone" class="w-[30%] h-full p-8 border-r border-white/5 bg-black/30 overflow-y-auto no-scrollbar shrink-0 flex flex-col transition-all duration-300">
-                    
-                    <div id="kEmptyMessage" class="flex-1 flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-white/10 rounded-3xl group hover:border-blue-500/50 transition-all">
-                        <div class="text-4xl mb-4 opacity-20 group-hover:opacity-100 group-hover:scale-110 transition-all">🎵</div>
-                        <p class="section-tag text-slate-500 mb-2">Aucune piste audio</p>
-                        <p class="text-[9px] font-bold text-slate-600 uppercase tracking-widest leading-relaxed">Glissez-déposez un fichier audio ici pour commencer le Karaoké</p>
-                    </div>
-
-                    <div id="kPlayerUI" class="hidden space-y-6">
-                        <button onclick="editCurrentKaraokeTrack()" class="w-full btn-action bg-blue-600/20 border border-blue-500/30 text-blue-400 mb-4 uppercase font-black text-[10px]">✏️ Modifier dans Studio</button>
-                        <div class="glass border-2 border-blue-500/20 p-6 rounded-2xl shadow-2xl">
-                            <p class="section-tag text-blue-400 mb-4">Lecture Karaoké</p>
-                            <div class="flex flex-col gap-6">
-                                <div class="flex items-center justify-center">
-                                    <button id="kPlayBtn" onclick="toggleKaraokePlay()" class="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-white text-3xl shadow-[0_0_30px_rgba(59,130,246,0.5)] hover:scale-105 transition-transform">▶</button>
-                                </div>
-                                <div class="space-y-2">
-                                    <div class="flex justify-between text-[10px] font-black text-slate-500 uppercase tracking-tighter"><span id="kCur">0:00</span><span id="kDur">0:00</span></div>
-                                    <input type="range" id="kSeek" value="0" step="0.1" class="w-full">
-                                </div>
-                                <p class="text-[8px] text-center opacity-30 uppercase font-black">Déposez un nouveau fichier pour remplacer</p>
-                            </div>
-                        </div>
-                    </div>
+                <div id="karaokeDropZone" class="w-[30%] h-full p-8 border-r border-white/5 bg-black/30 flex flex-col items-center justify-center text-center">
+                    <p class="section-tag text-slate-500 mb-2">Audio Storage</p>
+                    <button id="kPlayBtn" onclick="toggleKaraokePlay()" class="w-20 h-20 rounded-full bg-blue-600 text-white text-3xl shadow-lg uppercase">▶</button>
+                    <audio id="kAudio"></audio>
                 </div>
-                <div id="karaokeLyricsView" class="flex-1 relative overflow-y-auto p-12 bg-black/20 no-scrollbar">
+                <div id="karaokeLyricsView" class="flex-1 p-12 bg-black/20 no-scrollbar overflow-y-auto">
                     <div id="karaokeLyricsContent" class="suno-lyrics-canvas"></div>
                 </div>
             </div>
-            <audio id="kAudio"></audio>
         </div>
 
         <div id="content-studio" class="tab-content bg-black/40 flex-row">
             <div class="w-48 h-full flex flex-col p-6 space-y-6 border-r border-white/5 bg-black/60 shrink-0">
-                <p class="section-tag text-blue-400 font-black mb-4 uppercase tracking-widest">Cockpit</p>
-                <div class="flex flex-col gap-6">
-                    <button onclick="clearFields()" class="btn-cockpit group">RAZ / NOUVEAU</button>
-                    <button onclick="parseMasterText()" class="btn-cockpit group">PARSER IA</button>
-                    <button id="saveBtn" onclick="saveToMemory()" class="btn-cockpit group" disabled>SAUVEGARDER</button>
-                </div>
+                <button onclick="clearFields()" class="btn-action bg-white/5 border border-white/10 text-[10px]">RAZ</button>
+                <button id="saveBtn" onclick="saveToMemory()" class="btn-action bg-blue-600/40 text-blue-200 border border-blue-500/30 text-[10px]" disabled>SAUVEGARDER</button>
             </div>
-            
-            <div id="studioFormRightPanel" class="flex-1 h-full flex flex-col p-10 overflow-y-auto no-scrollbar glass relative bg-black/20">
-                <div class="mb-8 p-6 bg-blue-600/5 border border-blue-500/20 rounded-3xl flex items-center gap-6 shadow-lg shrink-0">
-                    <div class="flex-1 grid grid-cols-12 gap-4">
-                        <div class="col-span-5"><select id="studioAlbumSelect" onchange="updateStudioTitleList()" class="h-10 px-4"></select></div>
-                        <div class="col-span-5"><select id="studioTitleSelect" class="h-10 px-4"></select></div>
-                        <div class="col-span-2"><button onclick="loadSelectedTrackToStudio()" class="w-full h-10 bg-blue-600/20 border border-blue-500/30 text-blue-400 text-[10px] font-black rounded-lg uppercase">Charger</button></div>
-                    </div>
-                </div>
-
-                <div id="studioFormArea" class="space-y-8 flex flex-col flex-1 pb-32">
-                    <div class="flex items-start gap-8">
-                        <div class="shrink-0 space-y-2">
-                            <label class="section-tag text-blue-400 block text-center uppercase tracking-widest">Vignette</label>
-                            <div class="interactive-zone w-36 h-36 border border-white/10" onclick="triggerAlbumCoverLoad(document.getElementById('inAlbum').value)">
-                                <img id="inVignette" src="" class="w-full h-full object-cover bg-slate-900/50" onerror="this.src='https://via.placeholder.com/200/020617/FFFFFF?text=..'">
-                            </div>
-                        </div>
-                        <div class="flex-1 space-y-6">
-                            <div class="space-y-2"><label class="section-tag text-blue-400 font-black">Artiste</label><div class="interactive-zone border-2 border-blue-500/20"><input id="inArtist" oninput="validateSaveBtn();" class="font-black text-blue-400 py-2 text-lg uppercase" placeholder="CASILIEM"></div></div>
-                            <div class="grid grid-cols-12 gap-4 items-end">
-                                <div class="col-span-3 space-y-2"><label class="section-tag">Type</label><div class="interactive-zone"><select id="inType" onchange="toggleReleaseUI()"><option value="ALBUM">ALBUM</option><option value="SINGLE">SINGLE</option></select></div></div>
-                                <div class="col-span-5 space-y-2"><label class="section-tag">Projet Album</label><div class="interactive-zone"><input id="inAlbum" oninput="validateSaveBtn(); updateAvailableTrackNumbers();" class="font-bold text-blue-400 py-1 text-xs uppercase" placeholder="NOM DU PROJET"></div></div>
-                                <div class="col-span-4 space-y-2"><label class="section-tag text-pink-500">Record Date</label><div class="interactive-zone"><input type="text" id="inDate" class="text-center font-bold py-1 text-xs opacity-50 uppercase" readonly placeholder="Auto Date"></div></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-12 gap-4 items-end">
-                        <div class="col-span-2 space-y-2"><p id="curTrackIndicator" class="text-[10px] font-black text-blue-500 mb-1 uppercase text-center">PISTE : --</p><div class="interactive-zone"><select id="inTrack" onchange="updateTrackVisualIndicator(); validateSaveBtn();"></select></div></div>
-                        <div class="col-span-10 space-y-2"><label class="section-tag text-blue-400 font-black">Titre de la Chanson</label><div class="interactive-zone"><textarea id="inTitle" oninput="validateSaveBtn();" class="text-sm font-black uppercase py-1.5 h-10 no-scrollbar overflow-hidden" placeholder="NOM DU TITRE"></textarea></div></div>
-                    </div>
-
+            <div class="flex-1 h-full p-10 overflow-y-auto no-scrollbar">
+                <div class="space-y-4">
+                    <div class="interactive-zone"><input id="inArtist" placeholder="ARTISTE" class="uppercase font-black text-blue-400"></div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-2"><label class="section-tag text-purple-400">Architecture Suno AI</label><div class="interactive-zone"><textarea id="inSuno" class="h-20 text-[11px] italic" placeholder="Style musical..."></textarea></div></div>
-                        <div class="space-y-2"><label class="section-tag text-green-400">Soundtrap Setup Chain</label><div class="interactive-zone"><textarea id="inSettings" class="h-20 text-[11px] font-mono" placeholder="Effets et réglages..."></textarea></div></div>
+                        <div class="interactive-zone"><input id="inAlbum" placeholder="ALBUM" oninput="validateSaveBtn();" class="uppercase"></div>
+                        <div class="interactive-zone"><input id="inTrack" placeholder="N°" class="text-center"></div>
                     </div>
-
-                    <div class="interactive-zone p-1"><label class="section-tag">Injection IA Metadata</label><textarea id="inIA" class="h-24 text-[10px] font-mono leading-tight" placeholder="Collez le bloc IA ici..."></textarea></div>
-
-                    <div class="interactive-zone flex-1"><textarea id="inLyrics" class="h-80 text-xl font-bold tracking-tight leading-relaxed p-6" placeholder="Paroles..."></textarea></div>
+                    <div class="interactive-zone"><input id="inTitle" placeholder="TITRE" oninput="validateSaveBtn();" class="uppercase font-black"></div>
+                    <div class="interactive-zone"><textarea id="inLyrics" class="h-96 text-lg font-bold p-6" placeholder="PAROLES..."></textarea></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <input type="file" id="albumCoverTrigger" accept="image/*" class="hidden">
     <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(this)">
 
     <script>
         const DB_NAME = 'CasiLiemStudioDB_v68'; 
-        const DB_VERSION = 1;
         const STORE_CAT = 'studioData';
         const STORE_KARAOKE_AUD = 'karaokeAudio';
 
         let studioState = {};
-        let uiStyle = { neon: '#3b82f6', intensity: 35, bg: 'CasiLiem_Universe_Background.jpg', banner: '' };
+        let uiStyle = { neon: '#3b82f6' };
         let albumCovers = {};
-        let tempBannerData = null;
-        let karaokeAudioURL = null;
-        let editingOriginalTitle = "";
-        let inheritanceTarget = "";
+        let fileHandle = null;
 
-        // NAVIGATION
-        function switchTab(id) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
-            const activeTabBtn = document.getElementById(`tab-${id}`);
-            const activeContent = document.getElementById(`content-${id}`);
-            
-            if(activeTabBtn) activeTabBtn.classList.add('active');
-            if(activeContent) activeContent.classList.add('active');
-
-            if (id === 'discographie') displayGlobalAlbumsOverview();
-            if (id === 'studio') updateStudioAlbumList();
-            if (id === 'karaoke') updateKaraokeUI();
-            
-            const kP = document.getElementById('kAudio'); 
-            if(kP && id !== 'karaoke') kP.pause();
-        }
-
-        // DATABASE
         function initDB() {
             return new Promise((res) => {
-                const req = indexedDB.open(DB_NAME, DB_VERSION);
+                const req = indexedDB.open(DB_NAME, 1);
                 req.onupgradeneeded = (e) => {
                     const db = e.target.result;
                     if (!db.objectStoreNames.contains(STORE_CAT)) db.createObjectStore(STORE_CAT);
@@ -298,326 +125,113 @@
         }
 
         async function silentSync() {
-            if (!studioState) return;
             const db = await initDB();
-            const tx = db.transaction([STORE_CAT], 'readwrite');
-            const os = tx.objectStore(STORE_CAT);
-            os.put(studioState, 'catalog');
-            os.put(albumCovers, 'covers');
-            os.put(uiStyle, 'style');
+            return new Promise((resolve) => {
+                const tx = db.transaction(STORE_CAT, 'readwrite');
+                const os = tx.objectStore(STORE_CAT);
+                os.put(studioState, 'catalog');
+                os.put(albumCovers, 'covers');
+                os.put(uiStyle, 'style');
+                tx.oncomplete = () => resolve();
+            });
+        }
+
+        async function initFileHandle() {
+            try {
+                fileHandle = await window.showSaveFilePicker({
+                    suggestedName: 'CasiLiem_Studio_DATA.json',
+                    types: [{ description: 'JSON File', accept: {'application/json': ['.json']} }]
+                });
+                document.getElementById('linkFileBtn').textContent = "✅ JSON PC LIÉ";
+                document.getElementById('linkFileBtn').className = "btn-action bg-emerald-600/40 text-emerald-200 border border-emerald-500/30 text-[9px]";
+                showNotification("AUTO-SAVE PC ACTIF");
+            } catch (err) { showNotification("ÉCHEC LIAISON (HTTPS REQUIS)"); }
+        }
+
+        async function autoSaveToFile() {
+            if (!fileHandle) return;
+            try {
+                const writable = await fileHandle.createWritable();
+                await writable.write(JSON.stringify({ catalog: studioState, covers: albumCovers, style: uiStyle, v: "68.5" }));
+                await writable.close();
+                showNotification("SAVE PC OK");
+            } catch (err) { console.error(err); }
         }
 
         async function loadPersistedData() {
-            const db = await initDB();
-            const get = (key) => new Promise(res => {
-                const req = db.transaction(STORE_CAT, 'readonly').objectStore(STORE_CAT).get(key);
-                req.onsuccess = e => res(e.target.result);
-                req.onerror = () => res(null);
-            });
-            const cat = await get('catalog');
-            if (cat) { studioState = cat; updateAlbumFilterList(); displayGlobalAlbumsOverview(); updateStudioAlbumList(); }
-            const sty = await get('style');
-            if (sty) { uiStyle = sty; applyStyle(); }
-            const cov = await get('covers');
-            if (cov) { albumCovers = cov; displayGlobalAlbumsOverview(); }
-            showNotification("STUDIO PRÊT");
-        }
-
-        function showNotification(msg) {
-            const n = document.getElementById('centerNotification');
-            if(n) { n.textContent = msg; n.classList.add('show'); setTimeout(() => n.classList.remove('show'), 3000); }
-        }
-
-        function applyStyle() {
-            const r = document.documentElement; r.style.setProperty('--neon-color', uiStyle.neon); r.style.setProperty('--neon-intensity', uiStyle.intensity + 'px');
-            if(uiStyle.banner) document.getElementById('displayBanner').src = uiStyle.banner;
-        }
-
-        // ==========================================
-        // KARAOKE LAB LOGIC (NOUVELLES FONCTIONS)
-        // ==========================================
-        
-        async function updateKaraokeUI() {
-            const kAudio = document.getElementById('kAudio');
-            const kEmpty = document.getElementById('kEmptyMessage');
-            const kPlayer = document.getElementById('kPlayerUI');
-            const currentTitle = document.getElementById('karaokeCurrentTitle').textContent;
-
-            // Vérifier si un audio existe dans IndexedDB pour ce titre
-            if (currentTitle !== "Aucun Titre Sélectionné") {
-                const db = await initDB();
-                const tx = db.transaction(STORE_KARAOKE_AUD, 'readonly');
-                tx.objectStore(STORE_KARAOKE_AUD).get(currentTitle).onsuccess = (e) => {
-                    const blob = e.target.result;
-                    if (blob) {
-                        kEmpty.classList.add('hidden');
-                        kPlayer.classList.remove('hidden');
-                    } else {
-                        kEmpty.classList.remove('hidden');
-                        kPlayer.classList.add('hidden');
-                    }
-                };
-            } else {
-                kEmpty.classList.remove('hidden');
-                kPlayer.classList.add('hidden');
-            }
-        }
-
-        // Gestion du Drag & Drop
-        const kDropZone = document.getElementById('karaokeDropZone');
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
-            kDropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); });
-        });
-
-        kDropZone.addEventListener('dragover', () => kDropZone.classList.add('drag-active'));
-        kDropZone.addEventListener('dragleave', () => kDropZone.classList.remove('drag-active'));
-        kDropZone.addEventListener('drop', e => {
-            kDropZone.classList.remove('drag-active');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) handleAudioImport(files[0]);
-        });
-
-        async function handleAudioImport(file) {
-            const currentTitle = document.getElementById('karaokeCurrentTitle').textContent;
-            
-            if (currentTitle === "Aucun Titre Sélectionné") {
-                showNotification("⚠️ SÉLECTIONNEZ UN TITRE D'ABORD");
-                return;
-            }
-
-            if (!file.type.startsWith('audio/')) {
-                showNotification("❌ FORMAT AUDIO REQUIS");
-                return;
-            }
-
-            // Vérifier si audio existant
-            const db = await initDB();
-            const existing = await new Promise(res => {
-                db.transaction(STORE_KARAOKE_AUD, 'readonly').objectStore(STORE_KARAOKE_AUD).get(currentTitle).onsuccess = e => res(e.target.result);
-            });
-
-            if (existing) {
-                if (!confirm(`Une piste existe déjà pour "${currentTitle}". Voulez-vous la remplacer ?`)) return;
-            }
-
-            // Sauvegarder le nouveau fichier
-            const tx = db.transaction(STORE_KARAOKE_AUD, 'readwrite');
-            tx.objectStore(STORE_KARAOKE_AUD).put(file, currentTitle);
-            tx.oncomplete = () => {
-                showNotification("✅ PISTE AUDIO CHARGÉE");
-                // Forcer le rechargement de la source audio
-                const p = document.getElementById('kAudio');
-                p.src = ""; // Reset
-                updateKaraokeUI();
-            };
-        }
-
-        async function toggleKaraokePlay() {
-            const p = document.getElementById('kAudio'); 
-            const t = document.getElementById('karaokeCurrentTitle').textContent;
-            const b = document.getElementById('kPlayBtn');
-
-            if(!p.src || p.src === "" || p.src === window.location.href) {
-                const db = await initDB();
-                db.transaction(STORE_KARAOKE_AUD, 'readonly').objectStore(STORE_KARAOKE_AUD).get(t).onsuccess = (e) => {
-                    const blob = e.target.result;
-                    if(blob) { 
-                        if(karaokeAudioURL) URL.revokeObjectURL(karaokeAudioURL); 
-                        karaokeAudioURL = URL.createObjectURL(blob); 
-                        p.src = karaokeAudioURL; 
-                        p.play(); 
-                        b.textContent = "||";
-                    } else showNotification("AUCUN AUDIO");
-                };
-            } else { 
-                if(p.paused) { p.play(); b.textContent = "||"; } else { p.pause(); b.textContent = "▶"; }
-            }
-        }
-
-        function loadKaraokeTrack(t) {
-            if(!t || !studioState[t]) return;
-            document.getElementById('karaokeCurrentTitle').textContent = t;
-            document.getElementById('karaokeLyricsContent').innerText = studioState[t].lyrics || "Aucune parole.";
-            document.getElementById('kAudio').src = ""; 
-            document.getElementById('kPlayBtn').textContent = "▶";
-            updateKaraokeUI();
-        }
-
-        // ==========================================
-        // RESTE DU CODE (SANS CHANGEMENTS MAJEURS)
-        // ==========================================
-
-        function previewBanner(input) {
-            const file = input.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    tempBannerData = e.target.result;
-                    document.getElementById('displayBanner').src = tempBannerData;
-                    document.getElementById('validateBannerBtn').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        async function saveBanner() {
-            if (!tempBannerData) return;
-            uiStyle.banner = tempBannerData;
-            document.getElementById('validateBannerBtn').classList.add('hidden');
-            tempBannerData = null;
-            await silentSync();
-            showNotification("BANNIÈRE SAUVEGARDÉE");
-        }
-
-        function displayGlobalAlbumsOverview() {
-            const area = document.getElementById('overviewDisplayArea');
-            if(!area) return;
-            const filter = document.getElementById('albumFilter').value;
-            const albumGroups = {};
-            Object.values(studioState).forEach(s => {
-                if(!albumGroups[s.album]) albumGroups[s.album] = { count: 0, artist: s.artist || "UNKNOWN" };
-                albumGroups[s.album].count++;
-            });
-            let html = "";
-            Object.keys(albumGroups).sort().forEach(alb => {
-                if(filter && alb !== filter) return;
-                const cover = albumCovers[alb] || "";
-                html += `<div class="interactive-zone glass p-6 space-y-4">
-                    <div class="relative group">
-                        <img src="${cover}" class="w-full aspect-square rounded-3xl object-cover bg-slate-900" onerror="this.src='https://via.placeholder.com/400/020617/FFFFFF?text=..'">
-                    </div>
-                    <div>
-                        <p class="text-[11px] font-black text-blue-400 uppercase border-b border-blue-500/20 pb-1">${albumGroups[alb].artist}</p>
-                        <p class="text-xl font-black uppercase text-white">${alb}</p>
-                        <div class="pt-4 flex flex-col gap-2">${filterTitlesByAlbumRaw(alb)}</div>
-                    </div>
-                </div>`;
-            });
-            area.innerHTML = html || `<p class="col-span-full text-center py-20 opacity-30 italic uppercase text-[10px]">Aucune donnée disponible...</p>`;
-        }
-
-        function filterTitlesByAlbumRaw(alb) {
-            const fs = Object.keys(studioState).filter(t=>studioState[t].album===alb).sort((x,y)=>parseInt(studioState[x].track||0)-parseInt(studioState[y].track||0));
-            return fs.map(t => {
-                const escaped = t.replace(/'/g, "\\'");
-                return `<div class="flex justify-between items-center bg-white/5 p-2 rounded-xl text-[10px] font-bold uppercase group">
-                    <span class="text-slate-400">#${studioState[t].track||'??'} ${t}</span>
-                    <button onclick="directLoadKaraoke('${escaped}')" class="text-emerald-400 opacity-60 hover:opacity-100 flex items-center gap-1">🎤 <span class="text-[8px]">KARAOKE</span></button>
-                </div>`;
-            }).join('');
-        }
-
-        function directLoadKaraoke(t) { switchTab('karaoke'); loadKaraokeTrack(t); }
-
-        async function saveToMemory() {
-            const t = document.getElementById('inTitle').value.trim().toUpperCase(); 
-            const alb = document.getElementById('inAlbum').value.trim().toUpperCase();
-            const ar = document.getElementById('inArtist').value.trim().toUpperCase();
-            if(!t || !alb || !ar) return;
-            if (editingOriginalTitle && editingOriginalTitle !== t) delete studioState[editingOriginalTitle];
-            studioState[t] = { 
-                artist: ar, album: alb, track: document.getElementById('inTrack').value, 
-                releaseType: document.getElementById('inType').value, style: document.getElementById('inSuno').value, 
-                settings: document.getElementById('inSettings').value, lyrics: document.getElementById('inLyrics').value,
-                timestamp: new Date().toISOString() 
-            };
-            if(inheritanceTarget && inheritanceTarget === alb) albumCovers[alb] = document.getElementById('inVignette').src;
-            await silentSync(); displayGlobalAlbumsOverview(); updateStudioAlbumList(); updateAlbumFilterList(); clearFields(true); showNotification("SAUVEGARDÉ");
-        }
-
-        function editCurrentKaraokeTrack() {
-            const t = document.getElementById('karaokeCurrentTitle').textContent;
-            if(!t || t === "Aucun Titre Sélectionné") return;
-            const song = studioState[t]; if(!song) return;
-            switchTab('studio');
-            setTimeout(() => {
-                const albSel = document.getElementById('studioAlbumSelect');
-                if(albSel) { albSel.value = song.album; updateStudioTitleList(); document.getElementById('studioTitleSelect').value = t; loadSelectedTrackToStudio(); }
-            }, 150);
-        }
-
-        function parseMasterText() {
-            let r = document.getElementById('inIA').value; if (!r.trim()) return;
-            const g = (rx) => { const m = r.match(rx); return m ? m[1].trim() : null; };
-            const ar = g(/(?:ARTISTE|ARTIST)\s*:\s*([^\n\r]*)/i);
-            const ti = g(/TITRE\s*:\s*([^\n\r]*)/i);
-            const al = g(/ALBUM\s*:\s*([^\n\r]*)/i);
-            const tr = g(/(?:PISTE|TRACK|N°)\s*:\s*(\d+)/i);
-            if (ar) document.getElementById('inArtist').value = ar.toUpperCase();
-            if (ti) document.getElementById('inTitle').value = ti.toUpperCase();
-            if (al) { document.getElementById('inAlbum').value = al.toUpperCase(); updateAvailableTrackNumbers(); }
-            const ly = r.split(/PAROLES\s*:\s*/i)[1]; if (ly) document.getElementById('inLyrics').value = ly.trim();
-            if (tr) document.getElementById('inTrack').value = tr.padStart(2, '0');
-            validateSaveBtn(); updateTrackVisualIndicator(); showNotification("PARSING IA OK");
-        }
-
-        async function generateMasterDataPacket() {
-            showNotification("GÉNÉRATION DU PACK...");
+            const ind = document.getElementById('storageIndicator');
             try {
                 const db = await initDB();
-                const getStore = async (name) => {
-                    const tx = db.transaction(name, 'readonly');
-                    const os = tx.objectStore(name);
-                    const data = {};
-                    const keys = await new Promise(res => os.getAllKeys().onsuccess = e => res(e.target.result));
-                    for(const k of keys) {
-                        const b = await new Promise(res => os.get(k).onsuccess = e => res(e.target.result));
-                        if (b instanceof Blob || b instanceof File) {
-                            data[k] = await new Promise(res => { const fr = new FileReader(); fr.onload = e => res(e.target.result); fr.readAsDataURL(b); });
-                        }
-                    }
-                    return data;
+                const tx = db.transaction(STORE_CAT, 'readonly');
+                const os = tx.objectStore(STORE_CAT);
+                os.get('catalog').onsuccess = (e) => { if(e.target.result) studioState = e.target.result; };
+                os.get('covers').onsuccess = (e) => { if(e.target.result) albumCovers = e.target.result; };
+                tx.oncomplete = () => {
+                    ind.textContent = `v68.5 | ${Object.keys(studioState).length} TITRES`;
+                    displayGlobalAlbumsOverview();
                 };
-                const packet = { catalog: studioState, covers: albumCovers, style: uiStyle, karaokeAudio: await getStore(STORE_KARAOKE_AUD), v: "68.0" };
-                const blob = new Blob([JSON.stringify(packet)], {type:'application/json'});
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.href = url; a.download = `CasiLiem_Studio_DATA_V68.json`;
-                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-                showNotification("EXPORT RÉUSSI");
-            } catch (err) { console.error(err); showNotification("ERREUR EXPORT"); }
+            } catch (err) { ind.textContent = "MEMOIRE BLOQUÉE"; }
         }
 
-        async function importData(input) {
-            const file = input.files[0]; if(!file) return;
-            showNotification("IMPORTATION...");
+        function importData(input) {
+            const file = input.files[0];
             const reader = new FileReader();
             reader.onload = async (e) => {
-                let d; try { d = JSON.parse(e.target.result); } catch(err) { showNotification("JSON INVALIDE"); return; }
-                studioState = d.catalog || {}; albumCovers = d.covers || {}; uiStyle = d.style || uiStyle;
-                applyStyle(); displayGlobalAlbumsOverview(); updateStudioAlbumList(); updateAlbumFilterList();
-                const db = await initDB();
-                if(d.karaokeAudio) {
-                    for(const [k, v] of Object.entries(d.karaokeAudio)) {
-                        try { const res = await fetch(v); const blob = await res.blob(); const tx = db.transaction(STORE_KARAOKE_AUD, 'readwrite'); tx.objectStore(STORE_KARAOKE_AUD).put(blob, k); } 
-                        catch(err) { console.error("Erreur audio karaoke:", k); }
-                    }
-                }
-                await silentSync(); showNotification("SYNC OK");
+                const d = JSON.parse(e.target.result);
+                studioState = d.catalog || {};
+                albumCovers = d.covers || {};
+                await silentSync();
+                showNotification("IMPORT RÉUSSI");
+                setTimeout(() => location.reload(), 300);
             };
             reader.readAsText(file);
         }
 
-        function triggerAlbumCoverLoad(alb) { inheritanceTarget = alb; document.getElementById('albumCoverTrigger').click(); }
-        function validateSaveBtn() { const b = document.getElementById('saveBtn'); const ti = document.getElementById('inTitle').value.trim(); const al = document.getElementById('inAlbum').value.trim(); const ar = document.getElementById('inArtist').value.trim(); if(b) b.disabled = !(ti && al && ar); }
-        function clearFields(silent = false) { document.getElementById('inArtist').value = ""; document.getElementById('inTitle').value = ""; document.getElementById('inAlbum').value = ""; document.getElementById('inLyrics').value = ""; document.getElementById('inVignette').src = ""; editingOriginalTitle = ""; document.getElementById('inSuno').value = ""; document.getElementById('inSettings').value = ""; document.getElementById('inIA').value = ""; document.getElementById('curTrackIndicator').textContent = "PISTE : --"; validateSaveBtn(); updateAvailableTrackNumbers(); if(!silent) showNotification("NOUVEAU PROJET"); }
-        function toggleReleaseUI() { const t = document.getElementById('inType').value; const f = document.getElementById('inAlbum'); if (t === 'SINGLE' && (!f.value || f.value === "")) f.value = "SINGLES"; updateAvailableTrackNumbers(); }
-        function updateTrackVisualIndicator() { const num = document.getElementById('inTrack').value || "--"; document.getElementById('curTrackIndicator').textContent = "PISTE : " + num; }
-        function updateAvailableTrackNumbers() { const alb = document.getElementById('inAlbum').value.trim().toUpperCase(); const sel = document.getElementById('inTrack'); const used = Object.keys(studioState).filter(title => studioState[title].album === alb && title !== editingOriginalTitle).map(title => studioState[title].track); let h = '<option value="">-- N° --</option>'; for (let i = 1; i <= 15; i++) { const n = i.toString().padStart(2, '0'); if (!used.includes(n)) h += `<option value="${n}">${n}</option>`; } sel.innerHTML = h; }
-        function updateStudioAlbumList() { const s = document.getElementById('studioAlbumSelect'); if(!s) return; const albums = [...new Set(Object.values(studioState).map(s => s.album))].sort(); s.innerHTML = '<option value="">-- Sélectionner Album --</option>'; albums.forEach(alb => { if(alb) { const opt = document.createElement('option'); opt.value = alb; opt.textContent = alb; s.appendChild(opt); } }); }
-        function updateStudioTitleList() { const alb = document.getElementById('studioAlbumSelect').value; const s = document.getElementById('studioTitleSelect'); if(!s) return; s.innerHTML = '<option value="">-- Sélectionner Titre --</option>'; if(!alb) return; Object.keys(studioState).filter(t => studioState[t].album === alb).sort().forEach(t => { const opt = document.createElement('option'); opt.value = t; opt.textContent = t; s.appendChild(opt); }); }
-        function loadSelectedTrackToStudio() { const t = document.getElementById('studioTitleSelect').value; if(!t || !studioState[t]) return; const d = studioState[t]; editingOriginalTitle = t; document.getElementById('inArtist').value = d.artist || ""; document.getElementById('inTitle').value = t; document.getElementById('inAlbum').value = d.album || ""; document.getElementById('inType').value = d.releaseType || "ALBUM"; document.getElementById('inLyrics').value = d.lyrics || ""; document.getElementById('inVignette').src = albumCovers[d.album] || ""; document.getElementById('inSuno').value = d.style || ""; document.getElementById('inSettings').value = d.settings || ""; updateAvailableTrackNumbers(); document.getElementById('inTrack').value = d.track || ""; updateTrackVisualIndicator(); validateSaveBtn(); showNotification("DONNÉES CHARGÉES"); }
-        function updateAlbumFilterList() { const s = document.getElementById('albumFilter'); if(!s) return; const albums = [...new Set(Object.values(studioState).map(s => s.album))].sort(); s.innerHTML = '<option value="">-- Tous les Albums --</option>'; albums.forEach(alb => { if(alb) { const opt = document.createElement('option'); opt.value = alb; opt.textContent = alb; s.appendChild(opt); } }); }
-        function formatTime(s) { if(isNaN(s)) return "0:00"; const m = Math.floor(s/60); const sec = Math.floor(s%60); return m + ":" + (sec<10?"0":"") + sec; }
-        
-        const kAudio = document.getElementById('kAudio');
-        kAudio.ontimeupdate = () => { const s = document.getElementById('kSeek'); s.max = kAudio.duration; s.value = kAudio.currentTime; document.getElementById('kCur').textContent = formatTime(kAudio.currentTime); document.getElementById('kDur').textContent = formatTime(kAudio.duration); };
-        document.getElementById('kSeek').oninput = (e) => { kAudio.currentTime = e.target.value; };
-        document.getElementById('albumCoverTrigger').onchange = (e) => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = ev => { document.getElementById('inVignette').src = ev.target.result; }; reader.readAsDataURL(file); } };
-        function previewNeonColor(val) { uiStyle.neon = val; applyStyle(); }
-        function confirmNeonColor() { silentSync(); showNotification("STYLE APPLIQUÉ"); }
+        function displayGlobalAlbumsOverview() {
+            const area = document.getElementById('overviewDisplayArea'); if(!area) return;
+            const albumGroups = {};
+            Object.values(studioState).forEach(s => { if(!albumGroups[s.album]) albumGroups[s.album] = { artist: s.artist }; });
+            let html = "";
+            Object.keys(albumGroups).forEach(alb => {
+                html += `<div class="interactive-zone glass p-6">
+                    <p class="text-[11px] font-black text-blue-400 uppercase">${albumGroups[alb].artist}</p>
+                    <p class="text-xl font-black uppercase text-white">${alb}</p>
+                    <div class="pt-4 flex flex-col gap-2">${Object.keys(studioState).filter(t=>studioState[t].album===alb).map(t=>`<button onclick="directLoadKaraoke('${t}')" class="text-left text-[10px] bg-white/5 p-2 rounded">🎤 ${t}</button>`).join('')}</div>
+                </div>`;
+            });
+            area.innerHTML = html;
+        }
 
-        window.onload = async () => { await loadPersistedData(); };
-        setInterval(silentSync, 60000);
+        function switchTab(id) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(`tab-${id}`).classList.add('active');
+            document.getElementById(`content-${id}`).classList.add('active');
+        }
+
+        function showNotification(msg) {
+            const n = document.getElementById('centerNotification');
+            if(n) { n.textContent = msg; n.classList.add('show'); setTimeout(() => n.classList.remove('show'), 500); }
+        }
+
+        function validateSaveBtn() { document.getElementById('saveBtn').disabled = !(document.getElementById('inTitle').value && document.getElementById('inAlbum').value); }
+        function directLoadKaraoke(t) { 
+            switchTab('karaoke'); 
+            document.getElementById('karaokeCurrentTitle').textContent = t;
+            document.getElementById('karaokeLyricsContent').innerText = studioState[t].lyrics;
+        }
+
+        async function saveToMemory() {
+            const t = document.getElementById('inTitle').value.trim().toUpperCase();
+            studioState[t] = { artist: document.getElementById('inArtist').value.toUpperCase(), album: document.getElementById('inAlbum').value.toUpperCase(), track: document.getElementById('inTrack').value, lyrics: document.getElementById('inLyrics').value };
+            await silentSync();
+            if(fileHandle) await autoSaveToFile();
+            displayGlobalAlbumsOverview();
+            showNotification("SAUVEGARDÉ");
+        }
+
+        window.onload = loadPersistedData;
+        setInterval(async () => { await silentSync(); if(fileHandle) await autoSaveToFile(); }, 60000);
     </script>
 </body>
 </html>
